@@ -17,7 +17,6 @@ RUN set -ue; \
   . /opt/venv/bin/activate; \
   pip install $PYTORCH_TRITON_URL $TORCHAUDIO_URL $TORCHVISION_URL $TORCH_URL; \
   pip cache purge; \
-  echo "source /opt/venv/bin/activate" >> ~/.bashrc; \
   #
   # Add SBOM
   #
@@ -26,5 +25,6 @@ RUN set -ue; \
   jq -n --argjson apt "$apt_json"  --argjson pip "$pip_json" '{apt: $apt, pip: $pip}' > /.sbom.json;
 
 ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="/opt/venv/lib/python3.12/site-packages:$PYTHONPATH"
 
 CMD ["/bin/bash"]
