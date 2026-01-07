@@ -6,6 +6,7 @@ recipe_name: simple-example
 #
 # Image simple-example-base
 #
+ubuntu_tag: 24.04
 ubuntu_packages:
   - less
   - python3-pip
