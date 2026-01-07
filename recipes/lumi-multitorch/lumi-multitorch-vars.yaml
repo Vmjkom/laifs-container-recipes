@@ -110,7 +110,7 @@ llmcompressor_repo: "https://github.com/vllm-project/llm-compressor"
 multi_image_gpu_arch: "gfx90a"
 #
 vllm_version: "v0.13.0" # v0.13.0 is the latest release as of 2026-01-07
-vllm_commit: "72506c9" # 4fd9d6a is for commit id "tag/v0.13.0"
+vllm_commit: "72506c9"  # 72506c9 is for commit id "tag/v0.13.0"
 vllm_repo: "https://github.com/vllm-project/vllm"
 #
 wretag_url: "git+https://github.com/viahlgre/wretag.git@0da1af0"
