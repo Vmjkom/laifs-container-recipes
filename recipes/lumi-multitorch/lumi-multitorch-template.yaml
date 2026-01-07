@@ -265,6 +265,7 @@ steps:
         if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
             export FI_HMEM_DISABLE_P2P=1
         fi
+        exec "$@"
 
   - name: {{image_digest_name("mpich")}}
     base: {{image_digest_name("libfabric")}}
@@ -308,6 +309,7 @@ steps:
         if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
             export FI_HMEM_DISABLE_P2P=1
         fi
+        exec "$@"
 
   - name: {{image_digest_name("torch")}}
     base: {{image_digest_name("mpich")}}
@@ -340,6 +342,7 @@ steps:
         if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
             export FI_HMEM_DISABLE_P2P=1
         fi
+        exec "$@"
 
   - name: {{image_digest_name("full")}}
     base: {{image_digest_name("torch")}}
