@@ -228,6 +228,4 @@ RUN set -ue; \
   jq -n --argjson apt "$apt_json"  --argjson pip "$pip_json" '{apt: $apt, pip: $pip}' > /.sbom.json;
 
 
-ENV PATH="/opt/venv/bin:$PATH"
-
 CMD ["/bin/bash"]
