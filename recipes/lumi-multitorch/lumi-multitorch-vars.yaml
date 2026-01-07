@@ -40,24 +40,24 @@ extra_packages:
 cassini_headers_source: "https://github.com/HewlettPackard/shs-cassini-headers"
 cassini_headers_version: "12.0.1"
 #
-cxi_headers_version: "0.1git-3233be5b1"
+cxi_headers_version: "1.0.0-SHS12.0.2-27f7be5"
 cxi_headers_clone_url: "https://github.com/HewlettPackard/shs-cxi-driver"
-cxi_headers_git_commit: "3233be5b1"
+cxi_headers_git_commit: "27f7be5"
 #
-libcxi_version: "0.1git-ebd57a9ca"
+libcxi_version: "1.0.2-SHS12.0.2-30fa2dd"
 libcxi_clone_url: "https://github.com/HewlettPackard/shs-libcxi"
-libcxi_git_commit: "ebd57a9ca"
+libcxi_git_commit: "30fa2dd"
 #
-libfabric_git_commit: "e9cf535a"
-libfabric_version: "2.1.git-e9cf535a"
+libfabric_git_commit: "78d6e03"
+libfabric_version: "2.1.git-78d6e03"
 libfabric_clone_url: "https://github.com/ofiwg/libfabric"
 #
 xpmem_clone_url: "https://github.com/hpc/xpmem"
 xpmem_git_commit: "3bcab55"
 xpmem_version: "0.1-git3bcab55"
-xpmem_kernel_base_src: "linux-headers-5.15.0-160_5.15.0-160.170_all.deb"
-xpmem_kernel_generic_src: "linux-headers-5.15.0-160-generic_5.15.0-160.170_amd64.deb"
-xpmem_kernel_id: "linux-headers-5.15.0-160-generic"
+xpmem_kernel_base_src: "linux-headers-6.8.0-92_6.8.0-92.94_all.deb"
+xpmem_kernel_generic_src: "linux-headers-6.8.0-92-generic_6.8.0-92.94_amd64.deb"
+xpmem_kernel_id: "linux-headers-6.8.0-92-generic"
 
 #
 # ubuntu-rocm-libfabric-mpich

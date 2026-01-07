@@ -260,6 +260,11 @@ steps:
       - LIBFABRIC_GIT_COMMIT={{libfabric_git_commit}}
     export:
       name: {{image_digest_name("libfabric")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
 
   - name: {{image_digest_name("mpich")}}
     base: {{image_digest_name("libfabric")}}
@@ -298,6 +303,11 @@ steps:
       - RCCL_TESTS_VERSION={{rccl_tests_version}}
     export:
       name: {{image_digest_name("mpich")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
 
   - name: {{image_digest_name("torch")}}
     base: {{image_digest_name("mpich")}}
@@ -325,6 +335,11 @@ steps:
       - TORCH_URL={{torch_url}}
     export:
       name: {{image_digest_name("torch")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
 
   - name: {{image_digest_name("full")}}
     base: {{image_digest_name("torch")}}
@@ -392,6 +407,9 @@ steps:
       name: {{image_digest_name("full")}}
       def: |
         %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
         if [ "${ROCR_USE_SLURM_LOCALID}" = 1 ] && [ -n "${SLURM_LOCALID}" ]; then
             export ROCR_VISIBLE_DEVICES="$SLURM_LOCALID"
         fi
