@@ -1,7 +1,7 @@
 {#- Derive software digest string for the recipe from variables to keep the digest automatically updated -#}
 {%- set ubuntu_id = 'u' ~ ubuntu_release.split('.')[0] -%}
 {%- set rocm_id = 'r' ~ rocm_version.split('.')[0] ~ rocm_version.split('.')[1] -%}
-{%- set libfabric_id = 'f' ~ libfabric_version.split('.')[0] ~ libfabric_version.split('.')[1] -%}
+{%- set libfabric_id = 'f' ~ libfabric_version_prefix.split('.')[0] ~ libfabric_version_prefix.split('.')[1] -%}
 {%- set mpich_id = 'm' ~ mpich_version.split('.')[0] ~ mpich_version.split('.')[1] -%}
 {%- set torch_id = 't' ~ torch_version.split('.')[0] ~ torch_version.split('.')[1] -%}
 {%- set software_digest = ubuntu_id ~ rocm_id ~ libfabric_id ~ mpich_id ~ torch_id -%}
@@ -75,7 +75,7 @@ desc: |
     - {{software_digest}}: Major software versions digest, consisting of:
       - {{ubuntu_id}}: Digest from Ubuntu {{ubuntu_release}} LTS
       - {{rocm_id}}: Digest from ROCm {{rocm_version}}
-      - {{libfabric_id}}: Digest from libfabric {{libfabric_version}}
+      - {{libfabric_id}}: Digest from libfabric {{libfabric_version_prefix}}
       - {{mpich_id}}: Digest from MPICH {{mpich_version}}
       - {{torch_id}}: Digest from PyTorch {{torch_version}}
     - {{build_tag}}: Timestamp-based build tag
@@ -83,7 +83,7 @@ desc: |
   This release includes five images, each building on the previous one by adding
   new major functionality in the following order:
     - `{{image_digest_name("rocm")}}`: Starts from Ubuntu base image and adds ROCm {{rocm_version}}
-    - `{{image_digest_name("libfabric")}}`: Adds libfabric {{libfabric_version}} to the ROCm image
+    - `{{image_digest_name("libfabric")}}`: Adds libfabric {{libfabric_version_prefix}} to the ROCm image
     - `{{image_digest_name("mpich")}}`: Adds MPICH {{mpich_version}} with GPU support to the libfabric image
     - `{{image_digest_name("torch")}}`: Adds PyTorch {{torch_version}} to the MPICH image
     - `{{image_digest_name("full")}}`: Adds selection of AI and ML libraries to the PyTorch image
@@ -96,7 +96,7 @@ desc: |
     - Cassini headers (from {{cassini_headers_source}} release tgz for {{cassini_headers_version}})
     - CXI headers (from {{cxi_headers_clone_url}} commit {{cxi_headers_git_commit}})
     - Libcxi (from {{libcxi_clone_url}} commit {{libcxi_git_commit}})
-    - Libfabric {{libfabric_version}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
+    - Libfabric {{libfabric_version_prefix}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
     - MPICH {{mpich_version}} (from {{mpich_source}} release tgz for {{mpich_version}})
     - AWS-OFI-RCCL {{aws_ofi_rccl_version}} (from {{aws_ofi_rccl_repo}} commit {{aws_ofi_rccl_commit}})
     - RCCL (from {{rccl_tests_repo}} commit {{rccl_tests_commit}})
@@ -233,13 +233,13 @@ steps:
         - Cassini headers (from {{cassini_headers_source}} release tgz for {{cassini_headers_version}})
         - CXI headers (from {{cxi_headers_clone_url}} commit {{cxi_headers_git_commit}})
         - libcxi (from {{libcxi_clone_url}} commit {{libcxi_git_commit}})
-        - Libfabric {{libfabric_version}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
+        - Libfabric {{libfabric_version_prefix}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
     template: libfabric/Ubuntu_Rocm_Slingshot
     force: False
     env:
       - XPMEM_CLONE_URL={{xpmem_clone_url}}
       - XPMEM_GIT_COMMIT={{xpmem_git_commit}}
-      - XPMEM_VERSION={{xpmem_version}}
+      - XPMEM_VERSION={{xpmem_version_prefix}}-{{xpmem_git_commit}}
       - XPMEM_KERNEL_BASE_SRC={{xpmem_kernel_base_src}}
       - XPMEM_KERNEL_GENERIC_SRC={{xpmem_kernel_generic_src}}
       - XPMEM_KERNEL_ID={{xpmem_kernel_id}}
@@ -247,15 +247,15 @@ steps:
       - CASSINI_HEADERS_SOURCE={{cassini_headers_source}}
       - CASSINI_HEADERS_VERSION={{cassini_headers_version}}
       #
-      - CXI_HEADERS_VERSION={{cxi_headers_version}}
+      - CXI_HEADERS_VERSION={{cxi_headers_version_prefix}}-{{cxi_headers_git_commit}}
       - CXI_HEADERS_CLONE_URL={{cxi_headers_clone_url}}
       - CXI_HEADERS_GIT_COMMIT={{cxi_headers_git_commit}}
       #
-      - LIBCXI_VERSION={{libcxi_version}}
+      - LIBCXI_VERSION={{libcxi_version_prefix}}-{{libcxi_git_commit}}
       - LIBCXI_CLONE_URL={{libcxi_clone_url}}
       - LIBCXI_GIT_COMMIT={{libcxi_git_commit}}
       #
-      - LIBFABRIC_VERSION={{libfabric_version}}
+      - LIBFABRIC_VERSION={{libfabric_version_prefix}}-{{libfabric_git_commit}}
       - LIBFABRIC_CLONE_URL={{libfabric_clone_url}}
       - LIBFABRIC_GIT_COMMIT={{libfabric_git_commit}}
     export:
@@ -301,7 +301,7 @@ steps:
       - RCCL_TESTS_COMMIT={{rccl_tests_commit}}
       - RCCL_TESTS_GPU_ARCHS={{rccl_tests_gpu_archs}}
       - RCCL_TESTS_REPO={{rccl_tests_repo}}
-      - RCCL_TESTS_VERSION={{rccl_tests_version}}
+      - RCCL_TESTS_VERSION={{rccl_tests_version}}-{{rccl_tests_commit}}
     export:
       name: {{image_digest_name("mpich")}}
       def: |

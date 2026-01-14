@@ -40,21 +40,21 @@ extra_packages:
 cassini_headers_source: "https://github.com/HewlettPackard/shs-cassini-headers"
 cassini_headers_version: "12.0.1"
 #
-cxi_headers_version: "1.0.0-SHS12.0.2-27f7be5"
+cxi_headers_version_prefix: "1.0.0-SHS12.0.2"
 cxi_headers_clone_url: "https://github.com/HewlettPackard/shs-cxi-driver"
 cxi_headers_git_commit: "27f7be5"
 #
-libcxi_version: "1.0.2-SHS12.0.2-30fa2dd"
+libcxi_version_prefix: "1.0.2-SHS12.0.2"
 libcxi_clone_url: "https://github.com/HewlettPackard/shs-libcxi"
 libcxi_git_commit: "30fa2dd"
 #
 libfabric_git_commit: "78d6e03"
-libfabric_version: "2.1.git-78d6e03"
+libfabric_version_prefix: "2.1"
 libfabric_clone_url: "https://github.com/ofiwg/libfabric"
 #
 xpmem_clone_url: "https://github.com/hpc/xpmem"
 xpmem_git_commit: "3bcab55"
-xpmem_version: "0.1-git3bcab55"
+xpmem_version_prefix: "0.1"
 xpmem_kernel_base_src: "linux-headers-6.8.0-92_6.8.0-92.94_all.deb"
 xpmem_kernel_generic_src: "linux-headers-6.8.0-92-generic_6.8.0-92.94_amd64.deb"
 xpmem_kernel_id: "linux-headers-6.8.0-92-generic"
@@ -75,7 +75,7 @@ osu_version: "7.5.2"
 rccl_tests_repo: "https://github.com/ROCm/rccl-tests"
 rccl_tests_commit: "5272cd1" # Latest commit as of 2026-01-07
 rccl_tests_gpu_archs: "gfx90a"
-rccl_tests_version: "0.1git-5272cd1"
+rccl_tests_version_prefix: "0.1"
 
 #
 # ubuntu-rocm-libfabric-mpich-torch
