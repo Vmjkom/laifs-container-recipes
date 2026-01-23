@@ -111,6 +111,7 @@ desc: |
     - DeepSpeed {{deepspeed_version}} (with locally built ops addons)
     - Flash Attention (from {{flash_attention_repo_url}} commit {{flash_attention_repo_commit}})
     - LLM Compressor: (from {{llmcompressor_repo}} commit {{llmcompressor_commit}})
+    - Megatron LM (experimental): (from {{megatron_lm_repo}} commit {{megatron_lm_commit}})
     - vLLM {{vllm_version}} (from {{vllm_repo}} commit {{vllm_commit}})
     - xFormers (from {{xformers_repo}} commit {{xformers_commit}})
 
@@ -363,6 +364,7 @@ steps:
         - DeepSpeed {{deepspeed_version}} (with locally built ops addons)
         - Flash Attention (from {{flash_attention_repo_url}} commit {{flash_attention_repo_commit}})
         - LLM Compressor: (from {{llmcompressor_repo}} commit {{llmcompressor_commit}})
+        - Megatron LM (experimental): (from {{megatron_lm_repo}} commit {{megatron_lm_commit}})
         - vLLM {{vllm_version}} (from {{vllm_repo}} commit {{vllm_commit}})
         - xFormers (from {{xformers_repo}} commit {{xformers_commit}})
 
@@ -395,6 +397,9 @@ steps:
       #
       - LLMCOMPRESSOR_REPO={{llmcompressor_repo}}
       - LLMCOMPRESSOR_COMMIT={{llmcompressor_commit}}
+      #
+      - MEGATRON_LM_COMMIT={{megatron_lm_commit}}
+      - MEGATRON_LM_REPO_URL={{megatron_lm_repo_url}}
       #
       - MULTI_IMAGE_GPU_ARCH={{multi_image_gpu_arch}}
       #

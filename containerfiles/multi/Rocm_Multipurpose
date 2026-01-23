@@ -24,6 +24,9 @@ ARG EXTRA_PIP_PACKAGES
 ARG FLASH_ATTENTION_REPO_COMMIT
 ARG FLASH_ATTENTION_REPO_URL
 
+ARG MEGATRON_LM_REPO_URL
+ARG MEGATRON_LM_COMMIT
+
 ARG MULTI_IMAGE_GPU_ARCH
 
 ARG LLMCOMPRESSOR_REPO
@@ -210,6 +213,20 @@ RUN set -ue; \
   new_wheel="$(wretag -d -q lumi_aif_dsops $wheel_path)"; \
   pip install $new_wheel; \
   cd / && rm -rf /tmp/deepspeed;
+
+
+#
+# Install Megatron LM (experimental for testing)
+#
+
+RUN set -ue; \
+  . /opt/venv/bin/activate; \
+  pip wheel --no-deps -w /opt/src/megatronlm git+${MEGATRON_LM_REPO_URL}.git@${MEGATRON_LM_COMMIT}; \
+  wheel_path="$(find /opt/src/megatronlm -mindepth 1 -maxdepth 1 -type f -name '*.whl')"; \
+  test $(echo $wheel_path | wc -w) = 1; \
+  new_wheel="$(wretag -d -q lumi_aif_${MEGATRON_LM_COMMIT} $wheel_path)"; \
+  pip install $new_wheel; \
+  cd / && rm -rf /opt/src/megatronlm;
 
 
 #
