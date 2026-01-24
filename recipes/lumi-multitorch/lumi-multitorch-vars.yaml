@@ -107,7 +107,7 @@ flash_attention_repo_url: "https://github.com/ROCm/flash-attention"
 llmcompressor_commit: "129c793" # Commit id 129c793 is the latest release v0.9.0 as of 2026-01-07
 llmcompressor_repo: "https://github.com/vllm-project/llm-compressor"
 #
-megatron_lm_repo: "https://github.com/viahlgre/Megatron-LM"
+megatron_lm_repo_url: "https://github.com/viahlgre/Megatron-LM"
 megatron_lm_commit: "c913367" # c913367@viahlgre/Megatron-LM is 3b9414b@ROCm/Megatron-LM with Numpy 2+ patch
 #
 multi_image_gpu_arch: "gfx90a"
