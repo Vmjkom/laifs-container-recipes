@@ -421,8 +421,8 @@ steps:
         if [ "${ROCR_USE_SLURM_LOCALID}" = 1 ] && [ -n "${SLURM_LOCALID}" ]; then
             export ROCR_VISIBLE_DEVICES="$SLURM_LOCALID"
         fi
-        if [ -n "$ROCR_VISIBLE_DEVICES" ] && [ -z "$HIP_VISIBLE_DEVICES" ]; then
-            export HIP_VISIBLE_DEVICES="$ROCR_VISIBLE_DEVICES"
+        if [ "${MAP_HIP_TO_ROCR_VISIBLE_DEVICES}" = 1 ] && [ -n "${ROCR_VISIBLE_DEVICES}" ]; then
+            export HIP_VISIBLE_DEVICES=`seq -s , 0 $(echo "${ROCR_VISIBLE_DEVICES%%,}" | awk -F, '{print NF-1}')`
         fi
         exec "$@"
 files:
