@@ -15,42 +15,31 @@ ARG EXTRA_LOCALES
 ARG EXTRA_PACKAGES
 
 RUN set -ue; \
-  #
-  # Enable man pages with unminimize and install additional locales
-  #
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
   yes | unminimize; \
-  apt-get -y --no-install-recommends install man locales; \
+  apt-get install -y --no-install-recommends man locales; \
   locale-gen ${EXTRA_LOCALES}; \
-  #
-  # Add ROCm repository
-  #
+  apt-get clean; \
+  rm -rf /var/lib/apt/lists/*
+
+RUN set -ue; \
+  apt-get update; \
   apt-get install -y --no-install-recommends ca-certificates curl gnupg; \
-  #
-  printf "Package: *\nPin: release o=repo.radeon.com\nPin-Priority: 800\n" > /etc/apt/preferences.d/rocm-pin-prio-800; \
-  #
   curl -sL ${ROCM_REPO}/rocm.gpg.key | apt-key add -; \
-  #
+  printf "Package: *\nPin: release o=repo.radeon.com\nPin-Priority: 800\n" > /etc/apt/preferences.d/rocm-pin-prio-800; \
   printf "deb [arch=amd64] ${ROCM_REPO}/apt/${ROCM_VERSION}/ noble main\n" | tee --append /etc/apt/sources.list.d/rocm.list; \
   printf "deb [arch=amd64] ${AMDGPU_REPO}/${AMDGPU_VERSION}/ubuntu noble main\n" | tee /etc/apt/sources.list.d/amdgpu.list; \
-  #
-  # Install ROCm packages
-  #
+  apt-get clean; \
+  rm -rf /var/lib/apt/lists/*
+
+RUN set -ue; \
   apt-get update; \
-  apt-get install -y --no-install-recommends build-essential kmod libelf1 libnuma-dev zstd; \
-  apt-get install -y --no-install-recommends amdgpu-dkms rocm-dev$ROCM_VERSION rocm-libs$ROCM_VERSION; \
-  #
+  apt-get install -y --no-install-recommends build-essential kmod libelf1 libnuma-dev zstd amdgpu-dkms rocm-dev$ROCM_VERSION rocm-libs$ROCM_VERSION ${EXTRA_PACKAGES}; \
   echo /opt/rocm/lib > /etc/ld.so.conf.d/rocm-30.conf; \
   ldconfig; \
-  #
-  # Install extra packages
-  #
-  apt-get -y --no-install-recommends install ${EXTRA_PACKAGES}; \
-  apt clean ;\
-  rm -rf /var/lib/apt/lists/*; \
-  #
-  # Add SBOM
-  #
-  apt_json="$(dpkg-query -W -f='${Package}\t${Version}\n' | jq -R -s 'split("\n")[:-1] | map(split("\t") | {name: .[0], version: .[1]})')"; \
+  apt-get clean; \
+  rm -rf /var/lib/apt/lists/*
+
+RUN apt_json="$(dpkg-query -W -f='${Package}\t${Version}\n' | jq -R -s 'split("\n")[:-1] | map(split("\t") | {name: .[0], version: .[1]})')"; \
   jq -n --argjson apt "$apt_json"  '{apt: $apt}' > /.sbom.json;
