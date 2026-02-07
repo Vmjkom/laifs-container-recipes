@@ -17,7 +17,6 @@ ARG EXTRA_PACKAGES
 RUN set -ue; \
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
-  yes | unminimize; \
   apt-get install -y --no-install-recommends man locales; \
   locale-gen ${EXTRA_LOCALES}; \
   apt-get clean; \

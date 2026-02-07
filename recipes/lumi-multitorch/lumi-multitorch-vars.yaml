@@ -11,14 +11,8 @@ ubuntu_release: "24.04"
 ubuntu_tag: "noble-20251013"
 #
 extra_locales:
-  - cs_CZ.UTF-8
-  - da_DK.UTF-8
   - en_US.UTF-8
-  - et_EE.UTF-8
   - fi_FI.UTF-8
-  - nb_NO.UTF-8
-  - nn_NO.UTF-8
-  - pl_PL.UTF-8
 extra_packages:
   - file
   - git
@@ -34,6 +28,7 @@ extra_packages:
   - tmux
   - unzip
   - wget
+  - curl
 #
 # ubuntu-rocm-libfabric
 #
