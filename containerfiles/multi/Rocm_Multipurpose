@@ -8,9 +8,6 @@ ARG APEX_GIT_REPO
 ARG BASE_IMAGE
 ARG BASE_IMAGE_TAG
 
-ARG BITSANDBYTES_COMMIT
-ARG BITSANDBYTES_REPO_URL
-
 ARG CAUSAL_CONV1D_COMMIT
 ARG CAUSAL_CONV1D_REPO
 
@@ -67,24 +64,6 @@ RUN set -ue; \
   . /opt/venv/bin/activate; \
   pip install --no-cache-dir "${WRETAG_URL}"; \
   pip install --no-cache-dir ${DEPENDENCY_PIP_PACKAGES} ${EXTRA_PIP_PACKAGES};
-
-
-#
-# Install bitsandbytes for ROCm
-#
-RUN set -ue; \
-  . /opt/venv/bin/activate; \
-  git clone ${BITSANDBYTES_REPO_URL} /opt/src/bitsandbytes; \
-  cd /opt/src/bitsandbytes; \
-  git checkout ${BITSANDBYTES_COMMIT}; \
-  cmake -DCOMPUTE_BACKEND=hip -DGPU_TARGETS=${MULTI_IMAGE_GPU_ARCH} -DBNB_ROCM_ARCH=${MULTI_IMAGE_GPU_ARCH} -S .; \
-  make; \
-  pip wheel --no-deps . -w /opt/src/bitsandbytes/dist; \
-  wheel_path="$(find /opt/src/bitsandbytes/dist  -mindepth 1 -maxdepth 1 -type f -name '*.whl')"; \
-  test $(echo $wheel_path | wc -w) = 1; \
-  new_wheel="$(wretag -d -q lumi_aif_${MULTI_IMAGE_GPU_ARCH}_${BITSANDBYTES_COMMIT} $wheel_path)"; \
-  pip install --no-cache-dir $new_wheel; \
-  cd / && rm -rf /opt/src/bitsandbytes;
 
 
 #

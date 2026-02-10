@@ -93,9 +93,6 @@ torchvision_url: "https://download.pytorch.org/whl/rocm6.4/torchvision-0.24.1%2B
 apex_git_commit: "e37ed12" # Latest from branch release/1.9.0 (this branch is specifically for Pytorch 2.9)
 apex_git_repo: "https://github.com/ROCm/apex"
 #
-bitsandbytes_commit: "4fa939b" # 4fa939b is the latest commit in branch "rocm_enabled" as of 2026-02-09
-bitsandbytes_repo_url: "https://github.com/ROCm/bitsandbytes"
-#
 causal_conv1d_commit: "da6dbaa" # da6dbaa is the latest commit as of 2026-02-06
 causal_conv1d_repo: "https://github.com/Dao-AILab/causal-conv1d"
 #
@@ -140,6 +137,7 @@ extra_apt_packages:
   - sqlite3
 extra_pip_packages:
   - accelerate
+  - bitsandbytes
   - datasets
   - evaluate
   - huggingface-hub
