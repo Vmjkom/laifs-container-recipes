@@ -1,3 +1,19 @@
+# ===========================================================================
+# Build all images workflow
+#
+# - Runs full Podman clean before build
+# - Builds LUMI multitorch images
+# - Packages artifacts
+# - [TBD] Connects to the HPC storage via SSH and copies .sif image
+# - [TBD] Uploads image to LAIFS dockerhub
+# - Creates draft pre-release
+#
+# WARNING:
+# In order to maintain clean and consistent build environment, the workflow 
+# wipes all Podman images for the runner user.
+# Do not run concurrently on shared runners.
+# ===========================================================================
+
 name: Build all images
 
 on:
@@ -29,6 +45,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Warning: completly cleans podman environment for the runner user. Do not use in parallel
+      # with jobs that also use Podman under the same VM user.
+      - name: Hard reset Podman
+        run: podman system reset -f
+
       - name: Run build wrapper
         run: |
           scripts/build-wrapper \
@@ -53,8 +74,10 @@ jobs:
         with:
           tag_name: ${{ steps.prep.outputs.release_tag_name }}
           release_name: ${{ steps.prep.outputs.release_tag_name }}
-          draft: false
+          draft: true
           prerelease: true
+          body: |
+            Release ${{ steps.prep.outputs.release_tag_name }} is out!
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
