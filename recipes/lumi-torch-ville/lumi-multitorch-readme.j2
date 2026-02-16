@@ -1,0 +1,28 @@
+# LUMI AI Factory Container Image Collection {{ name }} release {{ tag }}
+
+**Release Link:**
+[GitHub Release](https://github.com/lumi-ai-factory/laifs-container-recipes/releases/tag/{{release}})
+
+**Related Links:**
+- [LUMI AI Factory](https://lumi-ai-factory.eu/)
+- [LUMI Supercomputer](https://lumi-supercomputer.eu/)
+- [GitHub Repository](https://github.com/lumi-ai-factory/laifs-container-recipes)
+- [GitHub Releases](https://github.com/lumi-ai-factory/laifs-container-recipes/releases)
+- [Docker Hub](https://hub.docker.com/u/lumiaifactory)
+
+## Overview
+
+{{ desc }}
+
+## Included Images
+
+The next sections describe each included image in detail. For
+convenience, this documentation is also available separately for
+each image in the per image Markdown (`.md`) files.
+
+{%- for step in steps %}
+
+### Image {{ step.name }}-{{tag}}
+
+{{ step.desc }}
+{%- endfor %}

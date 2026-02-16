@@ -1,0 +1,472 @@
+{#- Derive software digest string for the recipe from variables to keep the digest automatically updated -#}
+{%- set ubuntu_id = 'u' ~ ubuntu_release.split('.')[0] -%}
+{%- set rocm_id = 'r' ~ rocm_version.split('.')[0] ~ rocm_version.split('.')[1] -%}
+{%- set libfabric_id = 'f' ~ libfabric_version_prefix.split('.')[0] ~ libfabric_version_prefix.split('.')[1] -%}
+{%- set mpich_id = 'm' ~ mpich_version.split('.')[0] ~ mpich_version.split('.')[1] -%}
+{%- set torch_id = 't' ~ torch_version.split('.')[0] ~ torch_version.split('.')[1] -%}
+{%- set software_digest = ubuntu_id ~ rocm_id ~ libfabric_id ~ mpich_id ~ torch_id -%}
+
+{#- Enable rendering the template without build_tag set in the jinja2 context -#}
+{%- set build_tag = build_tag | default('build_tag_placeholder') -%}
+
+{#- Enable straight forward recipe name and target registry changes by using variables -#}
+{%- set recipe_base_name = 'lumi-multitorch' -%}
+{%- set recipe_full_name = recipe_base_name ~ '-' ~ software_digest -%}
+{%- set release_id = recipe_base_name ~ '-' ~ software_digest ~ '-' ~ build_tag -%}
+{%- set release_registry = "lumiaifactory/" ~ recipe_base_name -%}
+
+{%- set release_directory = "/appl/local/laifs/containers/" ~ release_id -%}
+{%- set release_digest_symlink = "/appl/local/laifs/containers/" ~ recipe_base_name ~ '-' ~ software_digest -%}
+{%- set release_latest_symlink = "/appl/local/laifs/containers/" ~ recipe_base_name -%}
+
+{#- Convert image name from for example "mpich" to "lumi-multitorch-mpich-u01r23f45m67t89" -#}
+{%- macro image_digest_name(short_name) -%}
+  {{- recipe_base_name ~ '-' ~ short_name ~ '-' ~ software_digest -}}
+{% endmacro %}
+
+{#- Convert image name from for example "mpich" to "lumi-multitorch-mpich-u01r23f45m67t89-20250204_123456" -#}
+{%- macro image_build_name(short_name) -%}
+  {{- image_digest_name(short_name) ~ '-' ~ build_tag -}}
+{% endmacro %}
+
+{#- Convert short image name such as "mpich" to full registry path + tag of the exact image -#}
+{%- macro image_registry_name(short_name) -%}
+  {{- release_registry ~ ':' ~ short_name ~ '-' ~ software_digest ~ '-' ~ build_tag -}}
+{% endmacro %}
+
+{#- Convert short image name such as "mpich" to registry path for latest image with the our digest -#}
+{%- macro image_registry_digest(short_name) -%}
+  {{- release_registry ~ ':' ~  short_name  ~ '-' ~ software_digest -}}
+{% endmacro %}
+
+{#- Convert short image name such as "mpich" to registry path for latest image this name -#}
+{%- macro image_registry_latest(short_name) -%}
+  {{- release_registry ~ ':' ~  short_name -}}
+{% endmacro %}
+
+{#- List of image variants for convenience with generating the documentation -#}
+{% set image_variants = ["full", "torch", "mpich", "libfabric", "rocm"] %}
+
+name: "{{ recipe_full_name }}"
+tag: "{{ build_tag }}"
+release: "{{ release_id }}"
+desc: |
+  This collection of container images is developed by the LUMI AI Factory and is
+  specifically designed for use on the LUMI supercomputer. The images are built
+  using recipes available in the LUMI AI Factory GitHub repository. Each image of
+  the release builds on the previous one by adding new features, finally resulting
+  in a fully featured, GPU-enabled and MPI-capable PyTorch-based multipurpose
+  ML/AI container image.
+
+  All build artifacts are publicly available. This includes the full recipe,
+  Containerfiles, build logs, and the resulting final container images. This
+  transparent approach enables full customization for special use cases, reuse
+  on other similar systems, as well as adapting the images to run on cloud
+  environments.
+
+  All images are published to Docker Hub, and ready-to-run Apptainer/Singularity
+  `.sif` versions of the images are available directly on LUMI. The generated
+  Containerfiles and other artifacts are released as public GitHub releases.
+
+  The release identifier `{{release_id}}` encodes
+  the following information:
+    - lumi: The primary target system for the images (LUMI)
+    - multitorch: Image type (a multipurpose PyTorch image)
+    - {{software_digest}}: Major software versions digest, consisting of:
+      - {{ubuntu_id}}: Digest from Ubuntu {{ubuntu_release}} LTS
+      - {{rocm_id}}: Digest from ROCm {{rocm_version}}
+      - {{libfabric_id}}: Digest from libfabric {{libfabric_version_prefix}}
+      - {{mpich_id}}: Digest from MPICH {{mpich_version}}
+      - {{torch_id}}: Digest from PyTorch {{torch_version}}
+    - {{build_tag}}: Timestamp-based build tag
+
+  This release includes five images, each building on the previous one by adding
+  new major functionality in the following order:
+    - `{{image_digest_name("rocm")}}`: Starts from Ubuntu base image and adds ROCm {{rocm_version}}
+    - `{{image_digest_name("libfabric")}}`: Adds libfabric {{libfabric_version_prefix}} to the ROCm image
+    - `{{image_digest_name("mpich")}}`: Adds MPICH {{mpich_version}} with GPU support to the libfabric image
+    - `{{image_digest_name("torch")}}`: Adds PyTorch {{torch_version}} to the MPICH image
+    - `{{image_digest_name("full")}}`: Adds selection of AI and ML libraries to the PyTorch image
+
+  The final image, `{{image_build_name("full")}}`,
+  includes these key software components:
+    - Ubuntu {{ubuntu_release}} LTS (from https://hub.docker.com/layers/library/ubuntu/{{ubuntu_tag}})
+    - AMD ROCm {{rocm_version}} (from {{rocm_repo}})
+    - Xpmem (from {{xpmem_clone_url}} commit {{xpmem_git_commit}})
+    - Cassini headers (from {{cassini_headers_source}} release tgz for {{cassini_headers_version}})
+    - CXI headers (from {{cxi_headers_clone_url}} commit {{cxi_headers_git_commit}})
+    - Libcxi (from {{libcxi_clone_url}} commit {{libcxi_git_commit}})
+    - Libfabric {{libfabric_version_prefix}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
+    - MPICH {{mpich_version}} (from {{mpich_source}} release tgz for {{mpich_version}})
+    - AWS-OFI-RCCL {{aws_ofi_rccl_version}} (from {{aws_ofi_rccl_repo}} commit {{aws_ofi_rccl_commit}})
+    - RCCL (from {{rccl_tests_repo}} commit {{rccl_tests_commit}})
+    - OSU micro-benchmarks {{osu_version}} (from {{osu_source}} release tgz for {{osu_version}})
+    - PyTorch {{torch_version}} (from {{torch_url}})
+    - TorchVision (from {{torchvision_url}})
+    - TorchAudio (from {{torchaudio_url}})
+    - PyTorch Triton (from {{pytorch_triton_url}})
+    - Apex (from {{apex_git_repo}} commit {{apex_git_commit}})
+    - Bitsandbytes (from {{bitsandbytes_repo_url}} commit {{bitsandbytes_commit}})
+    - Causal Conv1D (from {{causal_conv1d_repo}} commit {{causal_conv1d_commit}})
+    - DeepSpeed {{deepspeed_version}} (with locally built ops addons)
+    - Flash Attention (from {{flash_attention_repo_url}} commit {{flash_attention_repo_commit}})
+    - LLM Compressor: (from {{llmcompressor_repo}} commit {{llmcompressor_commit}})
+    - Megatron LM (experimental): (from {{megatron_lm_repo_url}} commit {{megatron_lm_commit}})
+    - vLLM {{vllm_version}} (from {{vllm_repo}} commit {{vllm_commit}})
+    - xFormers (from {{xformers_repo}} commit {{xformers_commit}})
+
+  These additional packages from PyPI are also included in the final image:
+    {%- for pkg in extra_pip_packages %}
+    - {{ pkg }}
+    {%- endfor %}
+
+  Documentation for each image is provided separately in the `<image name>.md`
+  Markdown text files, as well as in the next sections of this file. A Software
+  Bill of Materials (SBOM) with full software version numbers is available for
+  each image in files named `<image name>.json`. These files list all Ubuntu and
+  Python packages used in the images. Containerfiles and build logs for each image
+  are available in files named <image name>.Containerfile` and `<image name>.log`.
+
+  All software in the images is installed as either Python or Ubuntu packages.
+  Some packages are installed directly from Ubuntu repositories, some from PyPI,
+  and others such as PyTorch and ROCm, are installed from external upstream
+  package repositories (PyTorch project's repository, AMD's ROCm repository).
+  Lastly, the remaining packages are built locally during the container build
+  process and then installed as either Ubuntu or Python packages, resulting in
+  all included software being managed by either Ubuntu or Python package managers.
+
+  The GitHub release for this build consists of:
+    - A `.yaml` recipe file which defines the build steps, software versions, and
+      includes all required Containerfiles and documentation snippets to reproduce
+      the build of this release.
+    - Containerfiles and Singularity definition files (`.Containerfile`, `.def`)
+      for convenience (this data is embedded in the `.yaml` recipe as well).
+    - This release README file and separate per-image documentation (`.md`).
+    - Build logs (`.log`) and SBOM files (`.json`) for all images for
+      transparency.
+
+  The images are available for direct use on LUMI:
+    - Path to this exact release on LUMI is:
+      `{{release_directory}}`
+    - Latest build with the same software digest as this release is symlinked at:
+      `{{release_digest_symlink}}`
+    - Latest version (over all digests) is symlinked at:
+      `{{release_latest_symlink}}`
+    - Example listing of release directory content on LUMI:
+      - `{{recipe_base_name}}-{{software_digest}}-{{build_tag}}.md`: The main readme file
+      - `{{recipe_base_name}}-{{software_digest}}-{{build_tag}}.yaml`: The recipe file
+      {% for type in image_variants -%}
+      - `{{ image_build_name(type) }}.sif`: Singularity image for the {{ type }} image
+      - `{{ image_build_name(type) }}.md`: Readme file for the {{ type }} image
+      - `{{ image_build_name(type) }}.json`: Software Bill of materials for the {{ type }} image
+      {% endfor %}
+  Illustrative example use on LUMI:
+    ```
+    uan:~> srun --gpus-per-task=2 <other srun args> singularity \
+      run <singularity args> <path to sif image> \
+        python -c 'import torch; print("num gpus:", torch.cuda.device_count())'
+    [...]
+    num gpus: 2
+    ```
+
+  On Docker Hub the images are available with the following tag/naming scheme:
+    - The exact images from this recipe build:
+      {%- for type in image_variants %}
+      - Image {{ type }}: `{{image_registry_name( type )}}`
+      {%- endfor %}
+    - Latest build with specific significant software versions (using software digest):
+      {%- for type in image_variants %}
+      - Image {{ type }}:  `{{image_registry_digest(type)}}`
+      {%- endfor %}
+    - Floating tags for latest version (over any significant software versions / digests):
+      {%- for type in image_variants %}
+      - `{{image_registry_latest(type)}}`: latest complete {{ type }} image across all variants
+      {%- endfor %}
+    - Example Docker Hub pull commands:
+      - `docker pull {{image_registry_name("full")}}`
+      - `docker pull {{image_registry_digest("torch")}}`
+      - `docker pull {{image_registry_latest("rocm")}}`
+
+steps:
+  - name: {{image_digest_name("rocm")}}
+    base: ubuntu:{{ubuntu_tag}}
+    desc: |
+      **Overview**
+      This is a base image building on Ubuntu {{ubuntu_release}} LTS upstream image
+      with ROCm software from AMD's official Ubuntu repositories installed on top of
+      it. The image also adds a few commonly used extra Ubuntu packages and enables
+      man pages.
+
+      **Details**
+      Ubuntu base image: ubuntu:{{ubuntu_tag}}
+      AMD ROCm repository: {{rocm_repo}}
+      AMD ROCm release: {{rocm_version}}
+      Additional Ubuntu packages:
+      {%- for pkg in extra_packages %}
+        - {{ pkg }}
+      {%- endfor %}
+    template: rocm/Ubuntu2404_Rocm6
+    force: False
+    env:
+      - AMDGPU_REPO={{amdgpu_repo}}
+      - AMDGPU_VERSION={{amdgpu_version}}
+      - ROCM_REPO={{rocm_repo}}
+      - ROCM_VERSION={{rocm_version}}
+      - EXTRA_LOCALES="{{extra_locales | join(' ')}}"
+      - EXTRA_PACKAGES="{{extra_packages | join(' ')}}"
+    export:
+      name: {{image_digest_name("rocm")}}
+
+  - name: {{image_digest_name("libfabric")}}
+    base: {{image_digest_name("rocm")}}
+    desc: |
+      **Overview**
+      This image builds on top of its base image by adding locally built Ubuntu
+      packages to enable xpmem as well as libfabric functionality for HPE's Slingshot
+      interconnect. It serves as a starting point for adding MPI capability to images
+      built on top of it and can be a useful foundation for creating images with
+      custom MPI stacks.
+
+      **Details**
+      Base image: {{image_digest_name("rocm")}}
+      Components:
+        - xpmem (from {{xpmem_clone_url}} commit {{xpmem_git_commit}})
+        - Cassini headers (from {{cassini_headers_source}} release tgz for {{cassini_headers_version}})
+        - CXI headers (from {{cxi_headers_clone_url}} commit {{cxi_headers_git_commit}})
+        - libcxi (from {{libcxi_clone_url}} commit {{libcxi_git_commit}})
+        - Libfabric {{libfabric_version_prefix}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
+    template: libfabric/Ubuntu_Rocm_Slingshot
+    force: False
+    env:
+      - XPMEM_CLONE_URL={{xpmem_clone_url}}
+      - XPMEM_GIT_COMMIT={{xpmem_git_commit}}
+      - XPMEM_VERSION={{xpmem_version_prefix}}-{{xpmem_git_commit}}
+      - XPMEM_KERNEL_BASE_SRC={{xpmem_kernel_base_src}}
+      - XPMEM_KERNEL_GENERIC_SRC={{xpmem_kernel_generic_src}}
+      - XPMEM_KERNEL_ID={{xpmem_kernel_id}}
+      #
+      - CASSINI_HEADERS_SOURCE={{cassini_headers_source}}
+      - CASSINI_HEADERS_VERSION={{cassini_headers_version}}
+      #
+      - CXI_HEADERS_VERSION={{cxi_headers_version_prefix}}-{{cxi_headers_git_commit}}
+      - CXI_HEADERS_CLONE_URL={{cxi_headers_clone_url}}
+      - CXI_HEADERS_GIT_COMMIT={{cxi_headers_git_commit}}
+      #
+      - LIBCXI_VERSION={{libcxi_version_prefix}}-{{libcxi_git_commit}}
+      - LIBCXI_CLONE_URL={{libcxi_clone_url}}
+      - LIBCXI_GIT_COMMIT={{libcxi_git_commit}}
+      #
+      - LIBFABRIC_VERSION={{libfabric_version_prefix}}-{{libfabric_git_commit}}
+      - LIBFABRIC_CLONE_URL={{libfabric_clone_url}}
+      - LIBFABRIC_GIT_COMMIT={{libfabric_git_commit}}
+    export:
+      name: {{image_digest_name("libfabric")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
+        exec "$@"
+
+  - name: {{image_digest_name("mpich")}}
+    base: {{image_digest_name("libfabric")}}
+    desc: |
+      **Overview**
+      This image builds on top of its base image by adding an MPI library with GPU
+      support, based on an MPICH build. It also includes the AWS-OFI-RCCL plugin to
+      enable RCCL communication over the interconnect network using libfabric. The
+      rccl-tests and OSU micro-benchmarks suite are included for performance and
+      functionality validation.
+
+      **Details**
+      Base image: {{image_digest_name("libfabric")}}
+      MPI implementation: MPICH {{mpich_version}}
+      Components:
+        - MPICH {{mpich_version}} (from {{mpich_source}} release tgz for {{mpich_version}})
+        - AWS-OFI-RCCL {{aws_ofi_rccl_version}} (from {{aws_ofi_rccl_repo}} commit {{aws_ofi_rccl_commit}})
+        - RCCL (from {{rccl_tests_repo}} commit {{rccl_tests_commit}})
+        - OSU micro-benchmarks {{osu_version}} (from {{osu_source}} release tgz for {{osu_version}})
+    template: mpich/Ubuntu_Rocm_Slingshot
+    force: False
+    env:
+      - AWS_OFI_RCCL_COMMIT={{aws_ofi_rccl_commit}}
+      - AWS_OFI_RCCL_REPO={{aws_ofi_rccl_repo}}
+      - AWS_OFI_RCCL_VERSION={{aws_ofi_rccl_version}}
+      #
+      - MPICH_SOURCE={{mpich_source}}
+      - MPICH_VERSION={{mpich_version}}
+      #
+      - OSU_SOURCE={{osu_source}}
+      - OSU_VERSION={{osu_version}}
+      #
+      - RCCL_TESTS_COMMIT={{rccl_tests_commit}}
+      - RCCL_TESTS_GPU_ARCHS={{rccl_tests_gpu_archs}}
+      - RCCL_TESTS_REPO={{rccl_tests_repo}}
+      - RCCL_TESTS_VERSION={{rccl_tests_version_prefix}}-{{rccl_tests_commit}}
+    export:
+      name: {{image_digest_name("mpich")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
+        exec "$@"
+
+  - name: {{image_digest_name("torch")}}
+    base: {{image_digest_name("mpich")}}
+    desc: |
+      **Overview**
+      This image builds on top of its base image by adding PyTorch for AMD GPUs and
+      ROCm, along with few related packages from PyTorch's upstream repositories.
+
+      **Details**
+      Base image: {{image_digest_name("mpich")}}
+      PyTorch version: {{torch_version}}
+      PyTorch packages and sources:
+        - PyTorch: {{torch_url}}
+        - TorchVision: {{torchvision_url}}
+        - TorchAudio: {{torchaudio_url}}
+        - PyTorch Triton: {{pytorch_triton_url}}
+    template: torch/Venv_Torch
+    force: True
+    env:
+      - TORCH_VERSION={{torch_version}}
+      #
+      - PYTORCH_TRITON_URL={{pytorch_triton_url}}
+      - TORCHAUDIO_URL={{torchaudio_url}}
+      - TORCHVISION_URL={{torchvision_url}}
+      - TORCH_URL={{torch_url}}
+    export:
+      name: {{image_digest_name("torch")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
+        exec "$@"
+
+  - name: {{image_digest_name("full")}}
+    base: {{image_digest_name("torch")}}
+    desc: |
+      **Overview**
+      This is a multipurpose ML/AI image that builds on its base image by adding a
+      comprehensive selection of tools and libraries for machine learning and AI
+      workloads. The image is optimized to run on LUMI but should also work on other
+      systems with MI250x GPUs and Slingshot interconnect.
+
+      **Details**
+      Base image: {{image_digest_name("torch")}}
+      GPU architectures: {{multi_image_gpu_arch}}
+      Components:
+        - Apex (from {{apex_git_repo}} commit {{apex_git_commit}})
+        - bitsandbytes (from {{bitsandbytes_repo_url}} commit {{bitsandbytes_commit}})
+        - Causal Conv1D (from {{causal_conv1d_repo}} commit {{causal_conv1d_commit}})
+        - DeepSpeed {{deepspeed_version}} (with locally built ops addons)
+        - Flash Attention (from {{flash_attention_repo_url}} commit {{flash_attention_repo_commit}})
+        - LLM Compressor: (from {{llmcompressor_repo}} commit {{llmcompressor_commit}})
+        - Megatron LM (experimental): (from {{megatron_lm_repo_url}} commit {{megatron_lm_commit}})
+        - vLLM {{vllm_version}} (from {{vllm_repo}} commit {{vllm_commit}})
+        - xFormers (from {{xformers_repo}} commit {{xformers_commit}})
+
+      Additional Python packages from PyPI:
+        {%- for pkg in extra_pip_packages %}
+        - {{pkg}}
+        {%- endfor %}
+
+    template: multi/Rocm_Multipurpose
+    force: False
+    env:
+      - APEX_GIT_REPO={{apex_git_repo}}
+      - APEX_GIT_COMMIT={{apex_git_commit}}
+      #
+      - BITSANDBYTES_COMMIT={{bitsandbytes_commit}}
+      - BITSANDBYTES_REPO_URL={{bitsandbytes_repo_url}}
+      #
+      - CAUSAL_CONV1D_REPO={{causal_conv1d_repo}}
+      - CAUSAL_CONV1D_COMMIT={{causal_conv1d_commit}}
+      #
+      - DEEPSPEED_VERSION={{deepspeed_version}}
+      #
+      - DEPENDENCY_PIP_PACKAGES="{{dependency_pip_packages | join(' ')}}"
+      #
+      - EXTRA_APT_PACKAGES="{{extra_apt_packages | join(' ')}}"
+      - EXTRA_PIP_PACKAGES="{{extra_pip_packages | join(' ')}}"
+      #
+      - FLASH_ATTENTION_REPO_COMMIT={{flash_attention_repo_commit}}
+      - FLASH_ATTENTION_REPO_URL={{flash_attention_repo_url}}
+      #
+      - LLMCOMPRESSOR_REPO={{llmcompressor_repo}}
+      - LLMCOMPRESSOR_COMMIT={{llmcompressor_commit}}
+      #
+      - MEGATRON_LM_COMMIT={{megatron_lm_commit}}
+      - MEGATRON_LM_REPO_URL={{megatron_lm_repo_url}}
+      #
+      - MULTI_IMAGE_GPU_ARCH={{multi_image_gpu_arch}}
+      #
+      - VLLM_COMMIT={{vllm_commit}}
+      - VLLM_REPO={{vllm_repo}}
+      #
+      - WRETAG_URL={{wretag_url}}
+      #
+      - XFORMERS_COMMIT={{xformers_commit}}
+      - XFORMERS_REPO={{xformers_repo}}
+      #
+    export:
+      name: {{image_digest_name("full")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
+        if [ "${ROCR_USE_SLURM_LOCALID}" = 1 ] && [ -n "${SLURM_LOCALID}" ]; then
+            export ROCR_VISIBLE_DEVICES="$SLURM_LOCALID"
+        fi
+        if [ "${MAP_HIP_TO_ROCR_VISIBLE_DEVICES}" = 1 ] && [ -n "${ROCR_VISIBLE_DEVICES}" ]; then
+            export HIP_VISIBLE_DEVICES=`seq -s , 0 $(echo "${ROCR_VISIBLE_DEVICES%%,}" | awk -F, '{print NF-1}')`
+        fi
+        exec "$@"
+files:
+  - name: "{{release_id}}-post.sh"
+    desc: "Script for performing post-build actions"
+    content: |
+      #!/bin/bash
+
+      # This script is used for executing post-build tasks and should run after
+      # the image builds complete. Working directory needs to be the build dir.
+      #
+      # The script performs these actions:
+      # - Extracts and saves SBOM files from the images.
+      # - Generates a dedicated README file for each image.
+      # - Executes image tests if the test script is available.
+      # - Creates a SHA256 checksum file for all generated artifacts.
+
+      recipe_file="{{release_id}}.yaml"
+
+      {%- for type in image_variants %}
+
+      # Save per image files for {{ image_build_name(type) }}
+      step_name="{{ image_digest_name(type) }}"
+      image_name="{{ image_build_name(type) }}"
+
+      podman run -it --rm "${step_name}:{{build_tag}}" cat /.sbom.json > "${image_name}.json"
+
+      readme_file="${image_name}.md"
+      image_desc="$(yq . $recipe_file | jq -c -r ".steps[]|select(.name == \"$step_name\")|.desc")"
+      image_meta="$(podman image inspect "${step_name}:{{build_tag}}" | jq -r 'first|{Id,Created}|to_entries[]|"\(.key): \(.value)"')"
+
+      printf '# Container Image %s\n\n' "$image_name" > "$readme_file"
+      printf '%s\n\n' "$image_meta" >> "$readme_file"
+      printf '## Description\n\n%s\n\n' "$image_desc"  >> "$readme_file"
+      printf '## Files\n\n' >> "$readme_file"
+      sha256sum {{image_build_name(type)}}.{Containerfile,def,json,log,sif} >> "$readme_file"
+      {% endfor %}
+
+      # Run image tests
+      if [ -f ~/cicd-tests/test-image.sh ]; then
+        bash ~/cicd-tests/test-image.sh {{ release_id ~ '/' ~ image_build_name("full") }}.sif 2>&1 > {{release_id ~ '/' ~ release_id ~ '-tests.md' }}
+      else
+        echo "tests not available"
+      fi
+
+      # Checksum all files created so far
+      sha256sum {{recipe_base_name}}* > {{release_id}}.sha256
