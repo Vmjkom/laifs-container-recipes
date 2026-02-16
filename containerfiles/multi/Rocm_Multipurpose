@@ -73,6 +73,9 @@ RUN set -ue; \
   . /opt/venv/bin/activate; \
   git clone $FLASH_ATTENTION_REPO_URL /opt/src/flash-attention; \
   cd /opt/src/flash-attention; \
+  mkdir -p /opt/benchmarks/
+  # Copy the benchmark directory into the final container so that users can benchmark
+  cp -rf benchmarks /opt/benchmarks/flash_attn-benchmarks ; \
   git checkout $FLASH_ATTENTION_REPO_COMMIT; \
   BUILD_TARGET=rocm MAX_JOBS=$(nproc) GPU_ARCHS=$MULTI_IMAGE_GPU_ARCH python3 setup.py bdist_wheel --dist-dir=dist; \
   wheel_path="$(find /opt/src/flash-attention/dist  -mindepth 1 -maxdepth 1 -type f -name '*.whl')"; \
