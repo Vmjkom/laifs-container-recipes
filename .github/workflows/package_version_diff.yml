@@ -1,0 +1,69 @@
+name: Package version diff
+
+on:
+  workflow_dispatch:
+    inputs:
+      old_release:
+        description: "Old release tag"
+        required: true
+      new_release:
+        description: "New release tag"
+        required: true
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download old release asset
+        run: |
+          OLD_TAG="${{ github.event.inputs.old_release }}"
+          OLD_ASSET="${OLD_TAG}-release.tgz"
+
+          gh release download "$OLD_TAG" \
+            --repo "${{ github.repository }}" \
+            --pattern "$OLD_ASSET" \
+            --dir old_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download new release asset
+        run: |
+          NEW_TAG="${{ github.event.inputs.new_release }}"
+          NEW_ASSET="${NEW_TAG}-release.tgz"
+
+          gh release download "$NEW_TAG" \
+            --repo "${{ github.repository }}" \
+            --pattern "$NEW_ASSET" \
+            --dir new_release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract JSON files
+        run: |
+          tar -xzf old_release/*.tgz -C old_release
+          tar -xzf new_release/*.tgz -C new_release
+
+          OLD_JSON=$(find old_release -name "lumi-multitorch-full*.json" | head -n 1)
+          NEW_JSON=$(find new_release -name "lumi-multitorch-full*.json" | head -n 1)
+
+          if [ -z "$OLD_JSON" ] || [ -z "$NEW_JSON" ]; then
+            echo "Could not find lumi-multitorch-full*.json in one of the releases"
+            exit 1
+          fi
+
+          echo "OLD_JSON=$OLD_JSON" >> $GITHUB_ENV
+          echo "NEW_JSON=$NEW_JSON" >> $GITHUB_ENV
+
+      - name: Run package diff
+        run: |
+          python scripts/package_version_diff.py "$OLD_JSON" "$NEW_JSON" > diff.md
+
+      - name: Upload diff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-diff-${{ github.event.inputs.old_release }}-to-${{ github.event.inputs.new_release }}
+          path: diff.md
