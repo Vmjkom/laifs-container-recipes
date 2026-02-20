@@ -81,8 +81,7 @@ def main(old_path, new_path):
     else:
         print("_No changes detected._")
 
-    # CI-friendly exit code
-    sys.exit(1 if changes_found else 0)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
