@@ -185,7 +185,19 @@ RUN set -ue; \
 
 RUN set -ue; \
   . /opt/venv/bin/activate; \
+  export PYTORCH_ROCM_ARCH=$MULTI_IMAGE_GPU_ARCH; \
+  export DS_ACCELERATOR=cuda; \
   export DS_BUILD_OPS=1; \
+  #
+  # Some extensions need to be disabled
+  #
+  # https://github.com/deepspeedai/DeepSpeed/issues/7843#issuecomment-3896637925
+  #
+  export DS_BUILD_INFERENCE_CORE_OPS=0; \
+  export DS_BUILD_CUTLASS_OPS=0; \
+  export DS_BUILD_RAGGED_DEVICE_OPS=0; \
+  export DS_BUILD_RAGGED_OPS=0; \
+  #
   python3 -m pip wheel deepspeed==${DEEPSPEED_VERSION} --no-deps --no-build-isolation -w /tmp/deepspeed; \
   wheel_path="$(find /tmp/deepspeed  -mindepth 1 -maxdepth 1 -type f -name '*.whl')"; \
   test $(echo $wheel_path | wc -w) = 1; \
