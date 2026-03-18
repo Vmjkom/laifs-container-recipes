@@ -63,7 +63,7 @@ RUN set -ue; \
   #
   . /opt/venv/bin/activate; \
   pip install --no-cache-dir "${WRETAG_URL}"; \
-  pip install --no-cache-dir ${DEPENDENCY_PIP_PACKAGES} ${EXTRA_PIP_PACKAGES};
+  pip install --upgrade-strategy=only-if-needed --no-cache-dir ${DEPENDENCY_PIP_PACKAGES} ${EXTRA_PIP_PACKAGES};
 
 
 #

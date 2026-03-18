@@ -332,6 +332,7 @@ steps:
       - TORCH_VERSION={{torch_version}}
       #
       - PYTORCH_TRITON_URL={{pytorch_triton_url}}
+      - FAKE_TRITON_URL={{fake_triton_url}}
       - TORCHAUDIO_URL={{torchaudio_url}}
       - TORCHVISION_URL={{torchvision_url}}
       - TORCH_URL={{torch_url}}
