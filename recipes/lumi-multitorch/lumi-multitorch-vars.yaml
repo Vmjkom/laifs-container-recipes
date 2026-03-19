@@ -111,8 +111,8 @@ megatron_lm_commit: "c333868" # c333868@viahlgre/Megatron-LM is d85dd3c@ROCm/Meg
 #
 multi_image_gpu_arch: "gfx90a"
 #
-vllm_version: "v0.17.1" # "v0.17.1" is the latest release as of 2026-03-17
-vllm_commit: "95c0f92"  # 95c0f92 is for commit id "tag/v0.17.1"
+vllm_version: "v0.16.0" # "v0.16.0" is the last release for pytorch 2.9.1
+vllm_commit: "89a77b1"  # 89a77b1 is for commit id "tag/v0.16.0"
 vllm_repo: "https://github.com/vllm-project/vllm"
 #
 wretag_url: "git+https://github.com/viahlgre/wretag.git@0da1af0"
