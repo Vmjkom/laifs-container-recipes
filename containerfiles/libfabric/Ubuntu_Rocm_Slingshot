@@ -144,7 +144,7 @@ COPY --from=builder /debs/*.deb /tmp/debs/
 
 RUN set -ue; \
     #
-    # Install the built Ubuntu packages and  dependencies
+    # Install the built Ubuntu packages and dependencies
     #
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         autoconf \
@@ -162,6 +162,12 @@ RUN set -ue; \
     dpkg -i /tmp/debs/*.deb; \
     rm -rf /tmp/debs; \
     ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.8.0 /usr/lib64/libcurl.so.4; \
+    #
+    # Currently our builds put libraries under /usr/lib which we may change
+    # later to arch specific paths. For now, also add /usr/lib to ld.so.conf.
+    #
+    echo /usr/lib > /etc/ld.so.conf.d/10-usr-lib.conf; \
+    ldconfig; \
     #
     # Add SBOM
     #

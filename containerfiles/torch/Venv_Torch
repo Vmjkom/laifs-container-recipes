@@ -5,6 +5,7 @@ FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 ARG BASE_IMAGE
 ARG BASE_IMAGE_TAG
 ARG PYTORCH_TRITON_URL
+ARG FAKE_TRITON_URL
 ARG TORCHAUDIO_URL
 ARG TORCHVISION_URL
 ARG TORCH_URL
@@ -15,8 +16,10 @@ RUN set -ue; \
   #
   python3.12 -m venv /opt/venv; \
   . /opt/venv/bin/activate; \
-  pip install $PYTORCH_TRITON_URL $TORCHAUDIO_URL $TORCHVISION_URL $TORCH_URL; \
+  pip install $PYTORCH_TRITON_URL $TORCHAUDIO_URL $TORCHVISION_URL $TORCH_URL $FAKE_TRITON_URL patchelf; \
   pip cache purge; \
+  # Patch torch to prefer system rocm
+  patchelf --set-rpath '/opt/rocm/lib:/usr/lib:$ORIGIN' /opt/venv/lib/python3.12/site-packages/torch/lib/libtorch_hip.so; \
   #
   # Add SBOM
   #
