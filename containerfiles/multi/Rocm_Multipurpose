@@ -32,8 +32,6 @@ ARG LLMCOMPRESSOR_COMMIT
 ARG VLLM_COMMIT
 ARG VLLM_REPO
 
-ARG WRETAG_URL
-
 ARG XFORMERS_COMMIT
 ARG XFORMERS_REPO
 
@@ -62,7 +60,6 @@ RUN set -ue; \
   apt clean ;\
   #
   . /opt/venv/bin/activate; \
-  pip install --no-cache-dir "${WRETAG_URL}"; \
   pip install --upgrade-strategy=only-if-needed --no-cache-dir ${DEPENDENCY_PIP_PACKAGES} ${EXTRA_PIP_PACKAGES};
 
 

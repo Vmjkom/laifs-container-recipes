@@ -5,7 +5,7 @@ amdgpu_repo: "https://repo.radeon.com/amdgpu"
 amdgpu_version: "6.4.4"
 #
 rocm_repo: "https://repo.radeon.com/rocm"
-rocm_version: "6.4.4"
+rocm_version: "7.0.2"
 #
 ubuntu_release: "24.04"
 ubuntu_tag: "noble-20260217"
@@ -68,7 +68,7 @@ aws_ofi_rccl_commit: "6dae1b0"
 aws_ofi_rccl_version: "1.4.0-1"
 #
 mpich_source: "http://www.mpich.org/static/downloads"
-mpich_version: "4.3.2"
+mpich_version: "5.0.0"
 #
 osu_source: "https://mvapich.cse.ohio-state.edu/download/mvapich"
 osu_version: "7.5.2"
@@ -81,29 +81,51 @@ rccl_tests_version_prefix: "0.1"
 #
 # ubuntu-rocm-libfabric-mpich-torch
 #
-torch_version: "2.9.1"
+torch_repo: "https://github.com/pytorch/pytorch"
+torch_version: "2.10.0"
+torch_gpu_arch: "gfx90a"
 #
-fake_triton_url: "git+https://github.com/viahlgre/fake-triton.git@a8412a9"
-pytorch_triton_url: "https://download.pytorch.org/whl/pytorch_triton_rocm-3.5.1-cp312-cp312-linux_x86_64.whl"
-torch_url: "https://download.pytorch.org/whl/rocm6.4/torch-2.9.1%2Brocm6.4-cp312-cp312-manylinux_2_28_x86_64.whl"
-torchaudio_url: "https://download.pytorch.org/whl/rocm6.4/torchaudio-2.9.1%2Brocm6.4-cp312-cp312-manylinux_2_28_x86_64.whl"
-torchvision_url: "https://download.pytorch.org/whl/rocm6.4/torchvision-0.24.1%2Brocm6.4-cp312-cp312-manylinux_2_28_x86_64.whl"
+torch_pip_dependencies:
+  - mkl-include
+  - mkl-static
+  - ninja
+  - numpy
+  - packaging
+  - pyyaml
+  - requests
+  - setuptools
+  - six
+  - typing_extensions
+#
+torch_apt_dependencies:
+  - ccache
+  - cmake
+  - libjpeg-dev
+  - libopenblas-dev
+  - libpng-dev
+  - numactl
+#
+pytorch_triton_url: "https://download.pytorch.org/whl/triton_rocm-3.6.0-cp312-cp312-linux_x86_64.whl"
+torchaudio_url: "https://download-r2.pytorch.org/whl/rocm7.0/torchaudio-2.10.0%2Brocm7.0-cp312-cp312-manylinux_2_28_x86_64.whl"
+torchvision_url: "https://download-r2.pytorch.org/whl/rocm7.0/torchvision-0.25.0%2Brocm7.0-cp312-cp312-manylinux_2_28_x86_64.whl"
+#
+wretag_url: "git+https://github.com/viahlgre/wretag.git@0da1af0"
 
 #
 # ubuntu-rocm-libfabric-mpich-torch-full
 #
-apex_git_commit: "e37ed12" # Latest from branch release/1.9.0 (this branch is specifically for Pytorch 2.9)
+apex_git_commit: "73423b4" # Latest from branch release/1.10.0 (this branch is specifically for Pytorch 2.10.0)
 apex_git_repo: "https://github.com/ROCm/apex"
 #
-causal_conv1d_commit: "0d2252d" # da6dbaa is the latest commit as of 2026-03-17
+causal_conv1d_commit: "0d2252d" # da6dbaa is the latest commit as of 2026-03-30
 causal_conv1d_repo: "https://github.com/Dao-AILab/causal-conv1d"
 #
-deepspeed_version: "0.18.8" # Latest release as of 2026-03-17
+deepspeed_version: "0.18.8" # Latest release as of 2026-03-30
 #
 flash_attention_repo_commit: "bbe25ba" # Latest commit before "migrate to aiter commit" from the main_perf branch as of 2026-03-17
 flash_attention_repo_url: "https://github.com/ROCm/flash-attention"
 #
-llmcompressor_commit: "6a6cfec" # Commit id 6a6cfec is the latest release v0.10.0.1 as of 2026-03-17
+llmcompressor_commit: "6a6cfec" # Commit id 6a6cfec is the latest release v0.10.0.1 as of 2026-03-30
 llmcompressor_repo: "https://github.com/vllm-project/llm-compressor"
 #
 megatron_lm_repo_url: "https://github.com/viahlgre/Megatron-LM"
@@ -111,13 +133,11 @@ megatron_lm_commit: "c333868" # c333868@viahlgre/Megatron-LM is d85dd3c@ROCm/Meg
 #
 multi_image_gpu_arch: "gfx90a"
 #
-vllm_version: "v0.16.0" # "v0.16.0" is the last release for pytorch 2.9.1
-vllm_commit: "89a77b1"  # 89a77b1 is for commit id "tag/v0.16.0"
+vllm_version: "v0.18.0" # "v0.18.0" is the last release as of 2026-03-30
+vllm_commit: "bcf2be9"  # bcf2be9 is for commit id "tag/v0.18.0"
 vllm_repo: "https://github.com/vllm-project/vllm"
 #
-wretag_url: "git+https://github.com/viahlgre/wretag.git@0da1af0"
-#
-xformers_commit: "41531ce" # Commit id 41531ce is for the latest release "v0.0.33.post2" as of 2026-01-07
+xformers_commit: "03b91d7" # Commit id 03b91d7 is for the latest release "v0.0.35" as of 2026-03-30
 xformers_repo: "https://github.com/facebookresearch/xformers"
 #
 extra_apt_packages:

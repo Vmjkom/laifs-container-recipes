@@ -1,0 +1,80 @@
+@@ BUILD_ARGS @@
+
+FROM $BASE_IMAGE:$BASE_IMAGE_TAG
+
+ARG BASE_IMAGE
+ARG BASE_IMAGE_TAG
+
+ARG TORCH_REPO
+ARG TORCH_VERSION
+ARG TORCH_GPU_ARCH
+
+ARG TORCH_PIP_DEPENDENCIES
+ARG TORCH_APT_DEPENDENCIES
+
+ARG PYTORCH_TRITON_URL
+ARG TORCHAUDIO_URL
+ARG TORCHVISION_URL
+
+ARG WRETAG_URL
+
+RUN set -ue; \
+  #
+  mkdir /opt/src; \
+  #
+  test -f /opt/rocm/lib/llvm/bin/amdgpu-arch.really && { echo "error: amdgpu-arch.really already exists"; false; } || true; \
+  mv /opt/rocm/lib/llvm/bin/amdgpu-arch /opt/rocm/lib/llvm/bin/amdgpu-arch.really; \
+  printf "#!/bin/bash\necho ${TORCH_IMAGE_GPU_ARCH}\n" > /opt/rocm/lib/llvm/bin/amdgpu-arch; \
+  chmod a+rx /opt/rocm/lib/llvm/bin/amdgpu-arch; \
+  #
+  apt-get update; \
+  apt-get -y install ${TORCH_APT_DEPENDENCIES }; \
+  apt clean ;\
+  #
+  python3.12 -m venv /opt/venv; \
+  . /opt/venv/bin/activate; \
+  #
+  pip install --no-cache-dir "${WRETAG_URL}"; \
+  pip install --no-cache-dir ${TORCH_PIP_DEPENDENCIES}; \
+  pip install --no-cache-dir ${{PYTORCH_TRITON_URL}}; \
+  #
+  git clone --branch "v${TORCH_REPO}" --recursive ${TORCH_VERSION}; \
+  #
+  cd pytorch/; \
+  #
+  export CC=gcc; \
+  export CXX=g++; \
+  export USE_CUDA=0; \
+  export USE_ROCM=1; \
+  export USE_ROCM_CK_GEMM=1; \
+  export USE_ROCM_CK_SDPA=1; \
+  export USE_MPI=1; \
+  export USE_SYSTEM_NCCL=1; \
+  export PYTORCH_ROCM_ARCH=${TORCH_GPU_ARCH}; \
+  #
+  python3.12 tools/amd_build/build_amd.py; \
+  #
+  python -m pip install --no-build-isolation -v -e .; \
+  #
+  pip install $TORCHAUDIO_URL $TORCHVISION_URL; \
+  #
+  pip cache purge; \
+  #
+  rm -rf /opt/src/pytorch; \
+  #
+  rmdir /opt/src; \
+  #
+  test -f /opt/rocm/lib/llvm/bin/amdgpu-arch.really || { echo "error: amdgpu-arch.really is missing"; false; }; \
+  rm /opt/rocm/lib/llvm/bin/amdgpu-arch; \
+  mv /opt/rocm/lib/llvm/bin/amdgpu-arch.really /opt/rocm/lib/llvm/bin/amdgpu-arch; \
+  #
+  # Add SBOM
+  #
+  apt_json="$(dpkg-query -W -f='${Package}\t${Version}\n' | jq -R -s 'split("\n")[:-1] | map(split("\t") | {name: .[0], version: .[1]})')"; \
+  pip_json="$(pip list --format=json)"; \
+  jq -n --argjson apt "$apt_json"  --argjson pip "$pip_json" '{apt: $apt, pip: $pip}' > /.sbom.json;
+
+ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="/opt/venv/lib/python3.12/site-packages:$PYTHONPATH"
+
+CMD ["/bin/bash"]
