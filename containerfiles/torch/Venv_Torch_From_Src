@@ -24,11 +24,11 @@ RUN set -ue; \
   #
   test -f /opt/rocm/lib/llvm/bin/amdgpu-arch.really && { echo "error: amdgpu-arch.really already exists"; false; } || true; \
   mv /opt/rocm/lib/llvm/bin/amdgpu-arch /opt/rocm/lib/llvm/bin/amdgpu-arch.really; \
-  printf "#!/bin/bash\necho ${TORCH_IMAGE_GPU_ARCH}\n" > /opt/rocm/lib/llvm/bin/amdgpu-arch; \
+  printf "#!/bin/bash\necho ${TORCH_GPU_ARCH}\n" > /opt/rocm/lib/llvm/bin/amdgpu-arch; \
   chmod a+rx /opt/rocm/lib/llvm/bin/amdgpu-arch; \
   #
   apt-get update; \
-  apt-get -y install ${TORCH_APT_DEPENDENCIES }; \
+  apt-get -y install ${TORCH_APT_DEPENDENCIES}; \
   apt clean ;\
   #
   python3.12 -m venv /opt/venv; \
@@ -36,9 +36,9 @@ RUN set -ue; \
   #
   pip install --no-cache-dir "${WRETAG_URL}"; \
   pip install --no-cache-dir ${TORCH_PIP_DEPENDENCIES}; \
-  pip install --no-cache-dir ${{PYTORCH_TRITON_URL}}; \
+  pip install --no-cache-dir ${PYTORCH_TRITON_URL}; \
   #
-  git clone --branch "v${TORCH_REPO}" --recursive ${TORCH_VERSION}; \
+  git clone --branch "v${TORCH_VERSION}" --recursive ${TORCH_REPO}; \
   #
   cd pytorch/; \
   #

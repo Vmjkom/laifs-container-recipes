@@ -326,8 +326,8 @@ steps:
         - TorchVision: {{torchvision_url}}
         - TorchAudio: {{torchaudio_url}}
         - PyTorch Triton: {{pytorch_triton_url}}
-    template: torch/Venv_Torch
-    force: False
+    template: torch/Venv_Torch_From_Src
+    force: True
     env:
       - TORCH_REPO={{torch_repo}}
       - TORCH_VERSION={{torch_version}}
