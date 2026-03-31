@@ -69,7 +69,11 @@ RUN set -ue; \
   #
   python3.12 tools/amd_build/build_amd.py; \
   python -m pip wheel --no-build-isolation --no-deps -v -w /opt/wheels .; \
-  python -m pip install /opt/wheels/torch-*.whl; \
+  #
+  wheel_path="$(find /opt/wheels  -mindepth 1 -maxdepth 1 -type f -name '*.whl')"; \
+  test $(echo $wheel_path | wc -w) = 1; \
+  new_wheel="$(wretag -d -q ${TORCH_ROCM_VERSION}_lumi_aif_$(date -u +'%Y%m%d%H%M%S') $wheel_path)"; \
+  pip install $new_wheel; \
   #
   rm -f /opt/wheels/torch-*.whl; \
   #
