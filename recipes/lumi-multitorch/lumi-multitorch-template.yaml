@@ -331,6 +331,7 @@ steps:
     env:
       - TORCH_REPO={{torch_repo}}
       - TORCH_VERSION={{torch_version}}
+      - TORCH_ROCM_VERSION=rocm{{ rocm_version.split('.')[:2] | join('.') }}
       - TORCH_GPU_ARCH={{torch_gpu_arch}}
       #
       - TORCH_PIP_DEPENDENCIES="{{torch_pip_dependencies | join(' ')}}"

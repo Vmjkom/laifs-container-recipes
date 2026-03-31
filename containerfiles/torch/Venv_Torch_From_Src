@@ -7,6 +7,7 @@ ARG BASE_IMAGE_TAG
 
 ARG TORCH_REPO
 ARG TORCH_VERSION
+ARG TORCH_ROCM_VERSION
 ARG TORCH_GPU_ARCH
 
 ARG TORCH_PIP_DEPENDENCIES
@@ -21,6 +22,7 @@ ARG WRETAG_URL
 RUN set -ue; \
   #
   mkdir /opt/src; \
+  mkdir /opt/wheels; \
   #
   test -f /opt/rocm/lib/llvm/bin/amdgpu-arch.really && { echo "error: amdgpu-arch.really already exists"; false; } || true; \
   mv /opt/rocm/lib/llvm/bin/amdgpu-arch /opt/rocm/lib/llvm/bin/amdgpu-arch.really; \
@@ -42,19 +44,34 @@ RUN set -ue; \
   #
   cd pytorch/; \
   #
+  export GPU_ARCH_TYPE=rocm; \
+  export ROCM_HOME=/opt/rocm; \
+  export PYTORCH_ROCM_ARCH=${TORCH_GPU_ARCH}; \
+  export DESIRED_CUDA=${TORCH_ROCM_VERSION}; \
+  #
   export CC=gcc; \
   export CXX=g++; \
+  #
   export USE_CUDA=0; \
   export USE_ROCM=1; \
-  export USE_ROCM_CK_GEMM=1; \
-  export USE_ROCM_CK_SDPA=1; \
+  #
   export USE_MPI=1; \
+  export USE_C10D_MPI=1; \
   export USE_SYSTEM_NCCL=1; \
-  export PYTORCH_ROCM_ARCH=${TORCH_GPU_ARCH}; \
+  export USE_STATIC_NCCL=0; \
+  #
+  export BUILD_TEST=0; \
+  export INSTALL_TEST=0; \
+  export MAX_JOBS="$(nproc)"; \
+  #
+  export PYTORCH_BUILD_VERSION="${TORCH_VERSION}+${TORCH_ROCM_VERSION}"; \
+  export PYTORCH_BUILD_NUMBER=1; \
   #
   python3.12 tools/amd_build/build_amd.py; \
+  python -m pip wheel --no-build-isolation --no-deps -v -w /opt/wheels .; \
+  python -m pip install /opt/wheels/torch-*.whl; \
   #
-  python -m pip install --no-build-isolation -v -e .; \
+  rm -f /opt/wheels/torch-*.whl; \
   #
   pip install $TORCHAUDIO_URL $TORCHVISION_URL; \
   #
@@ -63,6 +80,7 @@ RUN set -ue; \
   rm -rf /opt/src/pytorch; \
   #
   rmdir /opt/src; \
+  rmdir /opt/wheels; \
   #
   test -f /opt/rocm/lib/llvm/bin/amdgpu-arch.really || { echo "error: amdgpu-arch.really is missing"; false; }; \
   rm /opt/rocm/lib/llvm/bin/amdgpu-arch; \
