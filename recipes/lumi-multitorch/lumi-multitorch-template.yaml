@@ -98,7 +98,7 @@ desc: |
     - Libcxi (from {{libcxi_clone_url}} commit {{libcxi_git_commit}})
     - Libfabric {{libfabric_version_prefix}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
     - MPICH {{mpich_version}} (from {{mpich_source}} release tgz for {{mpich_version}})
-    - AWS-OFI-RCCL {{aws_ofi_rccl_version}} (from {{aws_ofi_rccl_repo}} commit {{aws_ofi_rccl_commit}})
+    - AWS-OFI-RCCL {{aws_ofi_nccl_version}} (from {{aws_ofi_nccl_repo}} commit {{aws_ofi_nccl_commit}})
     - RCCL (from {{rccl_tests_repo}} commit {{rccl_tests_commit}})
     - OSU micro-benchmarks {{osu_version}} (from {{osu_source}} release tgz for {{osu_version}})
     - PyTorch {{torch_version}} (from {{torch_url}} tag v{{torch_version}})
@@ -282,15 +282,15 @@ steps:
       MPI implementation: MPICH {{mpich_version}}
       Components:
         - MPICH {{mpich_version}} (from {{mpich_source}} release tgz for {{mpich_version}})
-        - AWS-OFI-RCCL {{aws_ofi_rccl_version}} (from {{aws_ofi_rccl_repo}} commit {{aws_ofi_rccl_commit}})
+        - AWS-OFI-RCCL {{aws_ofi_nccl_version}} (from {{aws_ofi_nccl_repo}} commit {{aws_ofi_nccl_commit}})
         - RCCL (from {{rccl_tests_repo}} commit {{rccl_tests_commit}})
         - OSU micro-benchmarks {{osu_version}} (from {{osu_source}} release tgz for {{osu_version}})
     template: mpich/Ubuntu_Rocm_Slingshot
     force: False
     env:
-      - AWS_OFI_RCCL_COMMIT={{aws_ofi_rccl_commit}}
-      - AWS_OFI_RCCL_REPO={{aws_ofi_rccl_repo}}
-      - AWS_OFI_RCCL_VERSION={{aws_ofi_rccl_version}}
+      - AWS_OFI_NCCL_COMMIT={{aws_ofi_nccl_commit}}
+      - AWS_OFI_NCCL_REPO={{aws_ofi_nccl_repo}}
+      - AWS_OFI_NCCL_VERSION={{aws_ofi_nccl_version}}
       #
       - MPICH_SOURCE={{mpich_source}}
       - MPICH_VERSION={{mpich_version}}

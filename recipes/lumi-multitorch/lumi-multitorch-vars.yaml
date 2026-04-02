@@ -63,9 +63,9 @@ xpmem_kernel_id: "linux-headers-6.8.0-92-generic"
 #
 # ubuntu-rocm-libfabric-mpich
 #
-aws_ofi_rccl_repo: "https://github.com/ROCm/aws-ofi-rccl"
-aws_ofi_rccl_commit: "6dae1b0"
-aws_ofi_rccl_version: "1.4.0-1"
+aws_ofi_nccl_repo: "https://github.com/aws/aws-ofi-nccl"
+aws_ofi_nccl_commit: "e2f60b6"
+aws_ofi_nccl_version: "1.18.0-git-e2f60b6"
 #
 mpich_source: "http://www.mpich.org/static/downloads"
 mpich_version: "5.0.0"
