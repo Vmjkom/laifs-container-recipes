@@ -172,6 +172,7 @@ extra_pip_packages:
   - pandas
   - peft
   - scipy
+  - sentence-transformers
   - sentencepiece
   - tensorboard
   - trl
