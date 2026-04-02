@@ -9,6 +9,7 @@ ARG TORCH_REPO
 ARG TORCH_VERSION
 ARG TORCH_ROCM_VERSION
 ARG TORCH_GPU_ARCH
+ARG TORCH_PATCHES
 
 ARG TORCH_PIP_DEPENDENCIES
 ARG TORCH_APT_DEPENDENCIES
@@ -43,6 +44,10 @@ RUN set -ue; \
   git clone --branch "v${TORCH_VERSION}" --recursive ${TORCH_REPO}; \
   #
   cd pytorch/; \
+  #
+  for PATCH_URL in ${TORCH_PATCHES}; do curl -s $PATCH_URL | git apply; done; \
+  #
+  git status; \
   #
   export GPU_ARCH_TYPE=rocm; \
   export ROCM_HOME=/opt/rocm; \

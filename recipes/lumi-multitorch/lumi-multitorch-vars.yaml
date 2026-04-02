@@ -84,6 +84,8 @@ rccl_tests_version_prefix: "0.1"
 torch_repo: "https://github.com/pytorch/pytorch"
 torch_version: "2.10.0"
 torch_gpu_arch: "gfx90a"
+torch_patches:
+  - "https://github.com/viahlgre/pytorch/commit/f0374f296279f6fbdb3437a144b226521d00b788.patch"
 #
 torch_pip_dependencies:
   - mkl-include
