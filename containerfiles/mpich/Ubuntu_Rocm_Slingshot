@@ -28,7 +28,7 @@ ARG RCCL_TESTS_VERSION
 RUN set -ue; \
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
-  apt-get install -y ruby ruby-dev; \
+  apt-get install -y ruby ruby-dev libhwloc-dev; \
   gem install --no-document fpm; \
   mkdir /debs;
 
@@ -122,6 +122,7 @@ RUN set -ue; \
     #
     # Install all built Ubuntu packages
     #
+    apt-get update && apt-get install -y libhwloc-dev && apt-get clean; \
     dpkg -i /tmp/debs/*.deb; \
     rm -rf /tmp/debs; \
     #
