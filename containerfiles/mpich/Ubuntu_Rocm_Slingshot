@@ -9,6 +9,9 @@ ARG AWS_OFI_NCCL_VERSION
 ARG BASE_IMAGE
 ARG BASE_IMAGE_TAG
 
+ARG HWLOC_REPO
+ARG HWLOC_VERSION
+
 ARG MPICH_SOURCE
 ARG MPICH_VERSION
 
@@ -28,9 +31,31 @@ ARG RCCL_TESTS_VERSION
 RUN set -ue; \
   export DEBIAN_FRONTEND=noninteractive; \
   apt-get update; \
-  apt-get install -y ruby ruby-dev libhwloc-dev; \
+  apt-get install -y ruby ruby-dev; \
   gem install --no-document fpm; \
   mkdir /debs;
+
+
+#
+# Build and install hwloc (with rocm/amdgpu support) into the builder container
+#
+
+RUN set -ue; \
+    TMPROOT=$(mktemp -d); \
+    git clone "${HWLOC_REPO}" "$TMPROOT/hwloc"; \
+    cd  "$TMPROOT/hwloc"; \
+    git checkout "hwloc-${HWLOC_VERSION}"; \
+    ./autogen.sh; \
+    ./configure --with-rocm=/opt/rocm --with-amdgpu=/opt/amdgpu --prefix=/usr --disable-opencl --disable-gl --enable-plugins=pci; \
+    make -j $(nproc) DESTDIR="$TMPROOT" install; \
+    cd /debs; \
+    fpm -s dir -t deb -n libhwloc15 -v "${HWLOC_VERSION}" --description "LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')" --prefix / -C "$TMPROOT" \
+        -x 'usr/include/*' -x 'usr/lib/pkgconfig/*' -x 'usr/lib/*.la' -x 'usr/lib/hwloc/*' usr; \
+    fpm -s dir -t deb -n libhwloc-dev -v "${HWLOC_VERSION}" --description "LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')" --prefix / -C "$TMPROOT" \
+         usr/include usr/lib/pkgconfig/hwloc.pc usr/lib/libhwloc.la; \
+    fpm -s dir -t deb -n libhwloc-plugins -v "${HWLOC_VERSION}" --description "LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')" --prefix / -C "$TMPROOT" usr/lib/hwloc; \
+    rm -rf "$TMPROOT"; \
+    dpkg -i libhwloc*amd64.deb;
 
 
 #
@@ -122,7 +147,6 @@ RUN set -ue; \
     #
     # Install all built Ubuntu packages
     #
-    apt-get update && apt-get install -y libhwloc-dev && apt-get clean; \
     dpkg -i /tmp/debs/*.deb; \
     rm -rf /tmp/debs; \
     #

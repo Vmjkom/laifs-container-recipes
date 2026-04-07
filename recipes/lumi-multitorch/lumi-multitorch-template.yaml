@@ -292,6 +292,9 @@ steps:
       - AWS_OFI_NCCL_REPO={{aws_ofi_nccl_repo}}
       - AWS_OFI_NCCL_VERSION={{aws_ofi_nccl_version}}
       #
+      - HWLOC_REPO={{hwloc_repo}}
+      - HWLOC_VERSION={{hwloc_version}}
+      #
       - MPICH_SOURCE={{mpich_source}}
       - MPICH_VERSION={{mpich_version}}
       #
