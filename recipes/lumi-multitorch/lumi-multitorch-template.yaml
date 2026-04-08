@@ -297,6 +297,7 @@ steps:
       #
       - MPICH_SOURCE={{mpich_source}}
       - MPICH_VERSION={{mpich_version}}
+      - MPICH_GPU_ARCH={{mpich_gpu_arch}}
       #
       - OSU_SOURCE={{osu_source}}
       - OSU_VERSION={{osu_version}}

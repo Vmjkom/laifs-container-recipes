@@ -14,6 +14,7 @@ ARG HWLOC_VERSION
 
 ARG MPICH_SOURCE
 ARG MPICH_VERSION
+ARG MPICH_GPU_ARCH
 
 ARG OSU_SOURCE
 ARG OSU_VERSION
@@ -70,7 +71,7 @@ RUN set -ue; \
   curl -L -o "${TMPROOT}/src/${MPICH_TGZ}" "${MPICH_URL}"; \
   tar -C "${TMPROOT}/src" -xf "${TMPROOT}/src/${MPICH_TGZ}" --no-same-owner; \
   cd "${TMPROOT}/src/mpich-${MPICH_VERSION}"; \
-  ./configure --disable-fortran --enable-fast=O3 --enable-threads=multiple --prefix=/usr --with-device=ch4:ofi --with-hip=/opt/rocm --with-libfabric --with-xpmem=/usr --without-cuda --without-ucx; \
+  ./configure --disable-fortran --enable-fast=O3 --enable-threads=multiple --prefix=/usr --with-device=ch4:ofi --with-hip=/opt/rocm --with-libfabric --with-xpmem=/usr --without-cuda --without-ucx --with-hip-sm=${MPICH_GPU_ARCH}; \
   make -j $(nproc) DESTDIR="$TMPROOT" install; \
   cd /debs; \
   fpm -s dir -t deb -n mpich -v "${MPICH_VERSION}" --description "LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')" --prefix / -C "$TMPROOT"  usr/bin usr/etc usr/include usr/lib usr/share; \
