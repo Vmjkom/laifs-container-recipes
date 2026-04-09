@@ -500,4 +500,4 @@ files:
       ssh -l $SSH_USER $SSH_HOST chmod 2775 /appl/local/laifs/containers/{{release_id}}
 
       gh label create --repo https://github.com/lumi-ai-factory/laifs-container-recipes {{release_id}}
-      gh release create --notes-file {{release_id}}.md --title {{release_id}} {{release_id}}-release.tgz
+      gh release create {{release_id}} --verify-tag --notes-file {{release_id}}.md --title {{release_id}} {{release_id}}-release.tgz
