@@ -5,7 +5,7 @@ amdgpu_repo: "https://repo.radeon.com/amdgpu"
 amdgpu_version: "6.4.4"
 #
 rocm_repo: "https://repo.radeon.com/rocm"
-rocm_version: "7.0.2"
+rocm_version: "7.0.3"
 #
 ubuntu_release: "24.04"
 ubuntu_tag: "noble-20260217"

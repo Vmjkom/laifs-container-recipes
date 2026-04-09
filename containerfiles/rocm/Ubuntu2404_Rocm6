@@ -39,7 +39,7 @@ RUN set -ue; \
   #
   apt-get update; \
   apt-get install -y --no-install-recommends build-essential kmod libelf1 libnuma-dev zstd; \
-  apt-get install -y --no-install-recommends amdgpu-dkms rocm-dev$ROCM_VERSION rocm-libs$ROCM_VERSION; \
+  apt-get install -y --no-install-recommends amdgpu-dkms rocm-dev rocm-libs; \
   #
   echo /opt/rocm/lib > /etc/ld.so.conf.d/rocm-30.conf; \
   ldconfig; \
