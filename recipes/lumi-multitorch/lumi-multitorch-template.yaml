@@ -346,6 +346,8 @@ steps:
       - TORCHAUDIO_URL={{torchaudio_url}}
       - TORCHVISION_URL={{torchvision_url}}
       #
+      - FAKE_TRITON_URL={{fake_triton_url}}
+      #
       - WRETAG_URL={{wretag_url}}
 
     export:

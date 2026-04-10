@@ -82,7 +82,7 @@ RUN set -ue; \
   #
   rm -f /opt/wheels/torch-*.whl; \
   #
-  pip install $TORCHAUDIO_URL $TORCHVISION_URL; \
+  pip install $TORCHAUDIO_URL $TORCHVISION_URL $FAKE_TRITON_URL; \
   #
   pip cache purge; \
   #

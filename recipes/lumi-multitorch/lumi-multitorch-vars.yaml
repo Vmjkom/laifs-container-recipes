@@ -111,6 +111,7 @@ torch_apt_dependencies:
   - libpng-dev
   - numactl
 #
+fake_triton_url: "git+https://github.com/viahlgre/fake-triton.git@d35f4ca"
 pytorch_triton_url: "https://download.pytorch.org/whl/triton_rocm-3.6.0-cp312-cp312-linux_x86_64.whl"
 torchaudio_url: "https://download-r2.pytorch.org/whl/rocm7.0/torchaudio-2.10.0%2Brocm7.0-cp312-cp312-manylinux_2_28_x86_64.whl"
 torchvision_url: "https://download-r2.pytorch.org/whl/rocm7.0/torchvision-0.25.0%2Brocm7.0-cp312-cp312-manylinux_2_28_x86_64.whl"
