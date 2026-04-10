@@ -56,7 +56,7 @@ RUN set -ue; \
   cd /tmp/rocm_smi_lib; \
   # Mark locally built package by description
   sed -i -e "s/AMD System Management libraries/LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')/" CMakeLists.txt; \
-  # Patch double free bug, see https://github.com/ROCm/rocm-systems/pull/2531
+  # Patch the double free bug
   curl -s https://github.com/ROCm/rocm-systems/commit/ad06de002ede9716f931d9b3052b17c59360b44f.patch | \
     sed -e 's,projects/rocm-smi-lib/,,g' | git apply; \
   # Avoid generating wrong version number for the package
