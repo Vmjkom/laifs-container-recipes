@@ -38,7 +38,7 @@ RUN set -ue; \
   # Install ROCm packages
   #
   apt-get update; \
-  apt-get install -y --no-install-recommends build-essential kmod libelf1 libnuma-dev zstd; \
+  apt-get install -y --no-install-recommends build-essential cmake kmod libelf1 libnuma-dev pkgconf zstd; \
   apt-get install -y --no-install-recommends amdgpu-dkms rocm-dev rocm-libs; \
   #
   echo /opt/rocm/lib > /etc/ld.so.conf.d/rocm-30.conf; \
@@ -49,6 +49,25 @@ RUN set -ue; \
   apt-get -y --no-install-recommends install ${EXTRA_PACKAGES}; \
   apt-get clean ;\
   rm -rf /var/lib/apt/lists/*; \
+  #
+  # Workaround for smi double free bug, see https://github.com/ROCm/rocm-systems/pull/2531
+  #
+  git clone --branch rocm-${ROCM_VERSION} https://github.com/ROCm/rocm_smi_lib /tmp/rocm_smi_lib; \
+  cd /tmp/rocm_smi_lib; \
+  # Mark locally built package by description
+  sed -i -e "s/AMD System Management libraries/LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')/" CMakeLists.txt; \
+  # Patch double free bug, see https://github.com/ROCm/rocm-systems/pull/2531
+  curl -s https://github.com/ROCm/rocm-systems/commit/ad06de002ede9716f931d9b3052b17c59360b44f.patch | \
+    sed -e 's,projects/rocm-smi-lib/,,g' | git apply; \
+  # Avoid generating wrong version number for the package
+  rm -rf .git ;\
+  #
+  mkdir build && cd build; \
+  ROCM_LIBPATCH_VERSION=00001 CPACK_DEBIAN_PACKAGE_RELEASE=laifs cmake -DCPACK_GENERATOR=DEB ..; \
+  make -j $(nproc) package; \
+  dpkg -i rocm-smi-lib_*.deb; \
+  cd /; \
+  rm -rf /tmp/rocm_smi_lib; \
   #
   # Add SBOM
   #
