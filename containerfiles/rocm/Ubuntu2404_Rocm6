@@ -63,7 +63,9 @@ RUN set -ue; \
   rm -rf .git ;\
   #
   mkdir build && cd build; \
-  ROCM_LIBPATCH_VERSION=00001 CPACK_DEBIAN_PACKAGE_RELEASE=laifs cmake -DCPACK_GENERATOR=DEB ..; \
+  ROCM_LIBPATCH_VERSION="$(dpkg-query -W -f='${Version}\n' rocm-dev | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)-.*$/\1/')" \
+  CPACK_DEBIAN_PACKAGE_RELEASE="$(dpkg-query -W -f='${Version}\n' rocm-dev | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+-(.*)$/\1/')" \
+  cmake -DCPACK_GENERATOR=DEB ..; \
   make -j $(nproc) package; \
   dpkg -i rocm-smi-lib_*.deb; \
   cd /; \
