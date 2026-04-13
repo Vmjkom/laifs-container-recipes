@@ -154,8 +154,6 @@ extra_apt_packages:
   - libaio1t64
   # Ultralytics dependencies
   - ffmpeg
-  - libglib2.0-dev
-  - libopencv-dev
   # vLLM build
   - apt-transport-https
   - ca-certificates
@@ -184,7 +182,7 @@ extra_pip_packages:
   - sentencepiece
   - tensorboard
   - trl
-  - ultralytics
+  - ultralytics-opencv-headless
 dependency_pip_packages:
   # DeepSpeed OPS build
   - impi-devel
