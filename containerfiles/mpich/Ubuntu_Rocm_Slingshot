@@ -51,8 +51,8 @@ RUN set -ue; \
     make -j $(nproc) DESTDIR="$TMPROOT" install; \
     cd /debs; \
     fpm -s dir -t deb -n libhwloc15 -v "${HWLOC_VERSION}" --description "LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')" --prefix / -C "$TMPROOT" \
-        -x 'usr/include/*' -x 'usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/pkgconfig/*' \
-        -x 'usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/*.la' -x 'usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/hwloc/*' usr; \
+        -x "usr/include/*" -x "usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/pkgconfig/hwloc.pc" \
+        -x "usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/*.la" -x "usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/hwloc/*" usr; \
     fpm -s dir -t deb -n libhwloc-dev -v "${HWLOC_VERSION}" --description "LUMI-AIF-$(date -u +'%Y%m%d%H%M%S')" --prefix / -C "$TMPROOT" \
          usr/include usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/pkgconfig/hwloc.pc \
          usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/libhwloc.la; \
