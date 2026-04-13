@@ -59,8 +59,9 @@ RUN set -ue; \
   # Patch the double free bug
   curl -s https://github.com/ROCm/rocm-systems/commit/ad06de002ede9716f931d9b3052b17c59360b44f.patch | \
     sed -e 's,projects/rocm-smi-lib/,,g' | git apply; \
-  # Avoid generating wrong version number for the package
-  rm -rf .git ;\
+  # Set the lib versions manually for now. Hopefully we get rid of this whole workaround soon.
+  git tag rsmi_pkg_ver-7.8.0; \
+  git tag rsmi_so_ver-7.8.0; \
   #
   mkdir build && cd build; \
   ROCM_LIBPATCH_VERSION="$(dpkg-query -W -f='${Version}\n' rocm-dev | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)-.*$/\1/')" \
