@@ -148,7 +148,6 @@ xformers_commit: "03b91d7" # Commit id 03b91d7 is for the latest release "v0.0.3
 xformers_repo: "https://github.com/facebookresearch/xformers"
 #
 extra_apt_packages:
-  - cmake
   # DeepSpeed
   - libaio-dev
   - libaio1t64
