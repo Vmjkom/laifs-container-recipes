@@ -19,7 +19,8 @@ RUN set -ue; \
   pip install $PYTORCH_TRITON_URL $TORCHAUDIO_URL $TORCHVISION_URL $TORCH_URL $FAKE_TRITON_URL patchelf; \
   pip cache purge; \
   # Patch torch to prefer system rocm
-  patchelf --set-rpath '/opt/rocm/lib:/usr/lib:$ORIGIN' /opt/venv/lib/python3.12/site-packages/torch/lib/libtorch_hip.so; \
+  patchelf --set-rpath '/opt/rocm/lib:/usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH):$ORIGIN' \
+    /opt/venv/lib/python3.12/site-packages/torch/lib/libtorch_hip.so; \
   #
   # Add SBOM
   #
