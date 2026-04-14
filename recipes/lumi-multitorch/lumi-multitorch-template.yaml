@@ -87,7 +87,7 @@ desc: |
     - `{{image_digest_name("mpich")}}`: Adds MPICH {{mpich_version}} with GPU support to the libfabric image
     - `{{image_digest_name("torch")}}`: Adds PyTorch {{torch_version}} to the MPICH image
     - `{{image_digest_name("full")}}`: Adds selection of AI and ML libraries to the PyTorch image
-    - `{{image_digest_name("plus")}}`: Adds experimental software to the PyTorch image
+    - `{{image_digest_name("plus")}}`: Adds experimental software to the Full image
 
   The final image, `{{image_build_name("full")}}`,
   includes these key software components:
@@ -124,7 +124,7 @@ desc: |
   builds on the full image by introducing experimental software additions and
   potentially breaking changes. It is not intended for production use, but rather
   as a testing ground for evaluating potential future additions and for hosting
-  software with breaking dependencies or other limitations. See the full image
+  software with breaking dependencies or other limitations. See the image
   description below.
 
   Documentation for each image is provided separately in the `<image name>.md`
