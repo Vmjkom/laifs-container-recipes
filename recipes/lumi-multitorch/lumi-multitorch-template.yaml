@@ -45,7 +45,7 @@
 {% endmacro %}
 
 {#- List of image variants for convenience with generating the documentation -#}
-{% set image_variants = ["full", "torch", "mpich", "libfabric", "rocm"] %}
+{% set image_variants = ["plus", "full", "torch", "mpich", "libfabric", "rocm"] %}
 
 name: "{{ recipe_full_name }}"
 tag: "{{ build_tag }}"
@@ -87,6 +87,7 @@ desc: |
     - `{{image_digest_name("mpich")}}`: Adds MPICH {{mpich_version}} with GPU support to the libfabric image
     - `{{image_digest_name("torch")}}`: Adds PyTorch {{torch_version}} to the MPICH image
     - `{{image_digest_name("full")}}`: Adds selection of AI and ML libraries to the PyTorch image
+    - `{{image_digest_name("plus")}}`: Adds experimental software to the PyTorch image
 
   The final image, `{{image_build_name("full")}}`,
   includes these key software components:
@@ -118,6 +119,13 @@ desc: |
     {%- for pkg in extra_pip_packages %}
     - {{ pkg }}
     {%- endfor %}
+
+  The experimental image {{image_build_name("plus")}}
+  builds on the full image by introducing experimental software additions and
+  potentially breaking changes. It is not intended for production use, but rather
+  as a testing ground for evaluating potential future additions and for hosting
+  software with breaking dependencies or other limitations. See the full image
+  description below.
 
   Documentation for each image is provided separately in the `<image name>.md`
   Markdown text files, as well as in the next sections of this file. A Software
@@ -433,6 +441,45 @@ steps:
             export HIP_VISIBLE_DEVICES=`seq -s , 0 $(echo "${ROCR_VISIBLE_DEVICES%%,}" | awk -F, '{print NF-1}')`
         fi
         exec "$@"
+
+  - name: {{image_digest_name("plus")}}
+    base: {{image_digest_name("full")}}
+    desc: |
+      **Overview**
+      This experimental image builds on the full image by adding various additional
+      ML/AI libraries for testing purposes. It serves as a technology preview for
+      evaluating potential future additions to the full image and as a home for some
+      software components that are more difficult to maintain long term. The included
+      additional software may be removed without warning in minor image releases, and
+      the image is not intended for long-term use. To satisfy dependencies, some
+      libraries of the full image may be also downgraded in this image.
+
+      **Details**
+      Base image: {{image_digest_name("full")}}
+      GPU architectures: {{multi_image_gpu_arch}}
+      Components:
+        - TransformersEngine (from {{transformers_engine_repo}} commit {{transformers_engine_commit}})
+    template: plus/Plus
+    force: False
+    env:
+      - TRANSFORMERS_ENGINE_ARCH={{transformers_engine_arch}}
+      - TRANSFORMERS_ENGINE_COMMIT={{transformers_engine_commit}}
+      - TRANSFORMERS_ENGINE_REPO={{transformers_engine_repo}}
+    export:
+      name: {{image_digest_name("plus")}}
+      def: |
+        %runscript
+        if [ "${SLURM_NNODES}" = 1 ] && [ -z "${SLURM_GPUS_ON_NODE}" ]; then
+            export FI_HMEM_DISABLE_P2P=1
+        fi
+        if [ "${ROCR_USE_SLURM_LOCALID}" = 1 ] && [ -n "${SLURM_LOCALID}" ]; then
+            export ROCR_VISIBLE_DEVICES="$SLURM_LOCALID"
+        fi
+        if [ "${MAP_HIP_TO_ROCR_VISIBLE_DEVICES}" = 1 ] && [ -n "${ROCR_VISIBLE_DEVICES}" ]; then
+            export HIP_VISIBLE_DEVICES=`seq -s , 0 $(echo "${ROCR_VISIBLE_DEVICES%%,}" | awk -F, '{print NF-1}')`
+        fi
+        exec "$@"
+
 files:
   - name: "{{release_id}}-post.sh"
     desc: "Script for performing post-build actions"

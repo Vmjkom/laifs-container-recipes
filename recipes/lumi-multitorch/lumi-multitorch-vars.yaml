@@ -201,3 +201,10 @@ dependency_pip_packages:
   # vLLM build
   - jinja2
   - setuptools_scm
+
+#
+# ubuntu-rocm-libfabric-mpich-torch-full-plus
+#
+transformers_engine_arch: "gfx90a"
+transformers_engine_repo: "https://github.com/ROCm/TransformerEngine"
+transformers_engine_commit: "2.8_rocm"

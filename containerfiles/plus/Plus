@@ -1,0 +1,28 @@
+@@ BUILD_ARGS @@
+
+FROM $BASE_IMAGE:$BASE_IMAGE_TAG
+
+ARG BASE_IMAGE
+ARG BASE_IMAGE_TAG
+
+ARG TRANSFORMERS_ENGINE_ARCH
+ARG TRANSFORMERS_ENGINE_COMMIT
+ARG TRANSFORMERS_ENGINE_REPO
+
+RUN set -ue; \
+  #
+  export AOTRITON_TARGET_ARCH=${TRANSFORMERS_ENGINE_ARCH}; \
+  export GPU_ARCHS=${TRANSFORMERS_ENGINE_ARCH}; \
+  export GPU_TARGETS=${TRANSFORMERS_ENGINE_ARCH}; \
+  export NVTE_ROCM_ARCH=${TRANSFORMERS_ENGINE_ARCH}; \
+  export NVTE_FRAMEWORK=pytorch; \
+  export NVTE_FUSED_ATTN=0; \
+  #
+  git clone --recursive --branch "${TRANSFORMERS_ENGINE_COMMIT}" ${TRANSFORMERS_ENGINE_REPO} /opt/src/transformers_engine; \
+  #
+  /opt/src/transformers_engine; \
+  #
+  . /opt/venv/bin/activate; \
+  pip install .;
+
+CMD ["/bin/bash"]
