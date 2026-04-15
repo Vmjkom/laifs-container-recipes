@@ -177,12 +177,6 @@ RUN set -ue; \
 
 
 #
-# Temporary fix to update transformers while vLLM reguirements lag behind
-#
-RUN set -ue; \
-  pip install -U transformers;
-
-#
 # Install Deepspeed
 #
 

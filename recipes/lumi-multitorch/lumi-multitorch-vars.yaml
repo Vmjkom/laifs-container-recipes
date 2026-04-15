@@ -166,6 +166,7 @@ extra_pip_packages:
   - bitsandbytes
   - datasets
   - evaluate
+  - h5py
   - huggingface-hub
   - jupyter
   - lightning
