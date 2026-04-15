@@ -76,3 +76,5 @@ RUN set -ue; \
   #
   apt_json="$(dpkg-query -W -f='${Package}\t${Version}\n' | jq -R -s 'split("\n")[:-1] | map(split("\t") | {name: .[0], version: .[1]})')"; \
   jq -n --argjson apt "$apt_json"  '{apt: $apt}' > /.sbom.json;
+
+ENV ROCM_PATH=/opt/rocm

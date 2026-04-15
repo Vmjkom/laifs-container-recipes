@@ -12,17 +12,22 @@ ARG TRANSFORMERS_ENGINE_REPO
 RUN set -ue; \
   #
   export AOTRITON_TARGET_ARCH=${TRANSFORMERS_ENGINE_ARCH}; \
+  #
+  export CMAKE_PREFIX_PATH=/opt/rocm; \
+  #
   export GPU_ARCHS=${TRANSFORMERS_ENGINE_ARCH}; \
   export GPU_TARGETS=${TRANSFORMERS_ENGINE_ARCH}; \
+  #
   export NVTE_ROCM_ARCH=${TRANSFORMERS_ENGINE_ARCH}; \
   export NVTE_FRAMEWORK=pytorch; \
   export NVTE_FUSED_ATTN=0; \
   #
-  git clone --recursive --branch "${TRANSFORMERS_ENGINE_COMMIT}" ${TRANSFORMERS_ENGINE_REPO} /opt/src/transformers_engine; \
+  git clone --recursive --branch "v${TRANSFORMERS_ENGINE_COMMIT}" ${TRANSFORMERS_ENGINE_REPO} /opt/src/transformers_engine; \
   #
-  /opt/src/transformers_engine; \
+  cd /opt/src/transformers_engine; \
   #
   . /opt/venv/bin/activate; \
-  pip install .;
+  # --no-build-isolation needed for pytorch HIP support detection
+  pip install . --no-build-isolation;
 
 CMD ["/bin/bash"]
