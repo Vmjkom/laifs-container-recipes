@@ -16,7 +16,7 @@ RUN set -ue; \
   #
   python3.12 -m venv /opt/venv; \
   . /opt/venv/bin/activate; \
-  pip install $PYTORCH_TRITON_URL $TORCHAUDIO_URL $TORCHVISION_URL $TORCH_URL $FAKE_TRITON_URL patchelf; \
+  pip install $PYTORCH_TRITON_URL $TORCHAUDIO_URL $TORCHVISION_URL $TORCH_URL $FAKE_TRITON_URL patchelf /opt/rocm/share/amd_smi; \
   pip cache purge; \
   # Patch torch to prefer system rocm
   patchelf --set-rpath '/opt/rocm/lib:/usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH):$ORIGIN' \

@@ -41,6 +41,7 @@ RUN set -ue; \
   pip install --no-cache-dir "${WRETAG_URL}"; \
   pip install --no-cache-dir ${TORCH_PIP_DEPENDENCIES}; \
   pip install --no-cache-dir ${PYTORCH_TRITON_URL}; \
+  pip install --no-cache-dir /opt/rocm/share/amd_smi; \
   #
   git clone --branch "v${TORCH_VERSION}" --recursive ${TORCH_REPO}; \
   #

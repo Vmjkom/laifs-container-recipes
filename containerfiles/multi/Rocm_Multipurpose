@@ -142,8 +142,6 @@ RUN set -ue; \
 RUN set -ue; \
   . /opt/venv/bin/activate; \
   git clone ${VLLM_REPO} /opt/src/vllm; \
-  cd /opt/rocm/share/amd_smi; \
-  pip install --no-cache-dir .; \
   cd /opt/src/vllm; \
   git fetch --tags; \
   git checkout $VLLM_COMMIT; \
