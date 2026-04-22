@@ -539,9 +539,9 @@ files:
       podman push {{image_digest_name(type)}}:{{build_tag}} docker://docker.io/{{release_registry}}:{{type}}
       {% endfor %}
 
-      tar -C .. --exclude='*.tar' --exclude='*.sif' -czf {{release_id}}-release.tgz {{release_id}}
+      tar -C .. --exclude='*.tar' --exclude '*.tgz' --exclude='*.sif' -czf {{release_id}}-release.tgz {{release_id}}
 
-      rsync -avz --exclude='*.tar' ../{{release_id}} lumi.csc.fi:/appl/local/laifs/containers/
+      rsync -avz --exclude='*.tar' --exclude '*.sh' ../{{release_id}} lumi.csc.fi:/appl/local/laifs/containers/
 
       ssh -l $SSH_USER $SSH_HOST chgrp -R appl_laifs /appl/local/laifs/containers/{{release_id}}
       ssh -l $SSH_USER $SSH_HOST chmod 664 /appl/local/laifs/containers/{{release_id}}/lumi-multitorch-*
