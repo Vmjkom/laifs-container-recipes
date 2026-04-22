@@ -80,7 +80,7 @@ desc: |
       - {{torch_id}}: Digest from PyTorch {{torch_version}}
     - {{build_tag}}: Timestamp-based build tag
 
-  This release includes five images, each building on the previous one by adding
+  This release includes six images, each building on the previous one by adding
   new major functionality in the following order:
     - `{{image_digest_name("rocm")}}`: Starts from Ubuntu base image and adds ROCm {{rocm_version}}
     - `{{image_digest_name("libfabric")}}`: Adds libfabric {{libfabric_version_prefix}} to the ROCm image
@@ -99,7 +99,7 @@ desc: |
     - Libcxi (from {{libcxi_clone_url}} commit {{libcxi_git_commit}})
     - Libfabric {{libfabric_version_prefix}} (from {{libfabric_clone_url}} commit {{libfabric_git_commit}})
     - MPICH {{mpich_version}} (from {{mpich_source}} release tgz for {{mpich_version}})
-    - AWS-OFI-RCCL {{aws_ofi_nccl_version}} (from {{aws_ofi_nccl_repo}} commit {{aws_ofi_nccl_commit}})
+    - AWS-OFI-NCCL {{aws_ofi_nccl_version}} (from {{aws_ofi_nccl_repo}} commit {{aws_ofi_nccl_commit}})
     - RCCL (from {{rccl_tests_repo}} commit {{rccl_tests_commit}})
     - OSU micro-benchmarks {{osu_version}} (from {{osu_source}} release tgz for {{osu_version}})
     - PyTorch {{torch_version}} (from {{torch_url}} tag v{{torch_version}})
@@ -280,7 +280,7 @@ steps:
     desc: |
       **Overview**
       This image builds on top of its base image by adding an MPI library with GPU
-      support, based on an MPICH build. It also includes the AWS-OFI-RCCL plugin to
+      support, based on an MPICH build. It also includes the AWS-OFI-NCCL plugin to
       enable RCCL communication over the interconnect network using libfabric. The
       rccl-tests and OSU micro-benchmarks suite are included for performance and
       functionality validation.
@@ -290,7 +290,7 @@ steps:
       MPI implementation: MPICH {{mpich_version}}
       Components:
         - MPICH {{mpich_version}} (from {{mpich_source}} release tgz for {{mpich_version}})
-        - AWS-OFI-RCCL {{aws_ofi_nccl_version}} (from {{aws_ofi_nccl_repo}} commit {{aws_ofi_nccl_commit}})
+        - AWS-OFI-NCCL {{aws_ofi_nccl_version}} (from {{aws_ofi_nccl_repo}} commit {{aws_ofi_nccl_commit}})
         - RCCL (from {{rccl_tests_repo}} commit {{rccl_tests_commit}})
         - OSU micro-benchmarks {{osu_version}} (from {{osu_source}} release tgz for {{osu_version}})
     template: mpich/Ubuntu_Rocm_Slingshot
