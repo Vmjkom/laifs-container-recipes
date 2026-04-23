@@ -64,8 +64,8 @@ desc: |
   on other similar systems, as well as adapting the images to run on cloud
   environments.
 
-  All images are published to Docker Hub, and ready-to-run Apptainer/Singularity
-  `.sif` versions of the images are available directly on LUMI. The generated
+  All images are published to Docker Hub, and ready-to-run Singularity Image Format
+  (SIF) versions of the images are available directly on LUMI. The generated
   Containerfiles and other artifacts are released as public GitHub releases.
 
   The release identifier `{{release_id}}` encodes
@@ -146,7 +146,7 @@ desc: |
     - A `.yaml` recipe file which defines the build steps, software versions, and
       includes all required Containerfiles and documentation snippets to reproduce
       the build of this release.
-    - Containerfiles and Singularity definition files (`.Containerfile`, `.def`)
+    - Containerfiles and Apptainer definition files (`.Containerfile`, `.def`)
       for convenience (this data is embedded in the `.yaml` recipe as well).
     - This release README file and separate per-image documentation (`.md`).
     - Build logs (`.log`) and SBOM files (`.json`) for all images for
@@ -163,7 +163,7 @@ desc: |
       - `{{recipe_base_name}}-{{software_digest}}-{{build_tag}}.md`: The main readme file
       - `{{recipe_base_name}}-{{software_digest}}-{{build_tag}}.yaml`: The recipe file
       {% for type in image_variants -%}
-      - `{{ image_build_name(type) }}.sif`: Singularity image for the {{ type }} image
+      - `{{ image_build_name(type) }}.sif`: SIF image for the {{ type }} image
       - `{{ image_build_name(type) }}.md`: Readme file for the {{ type }} image
       - `{{ image_build_name(type) }}.json`: Software Bill of materials for the {{ type }} image
       {% endfor %}

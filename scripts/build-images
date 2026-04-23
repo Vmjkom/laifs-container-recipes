@@ -116,7 +116,7 @@ export_image() {
 
     printf 'Bootstrap: oci-archive\nFrom: %s\n%s\n' "${OCI_FILE}" "${EXPORT_SIF_DEF}" > "$DEF_FILE"
 
-    local SIF_COMMAND="singularity build ${SIF_FILE} ${DEF_FILE}"
+    local SIF_COMMAND="apptainer build ${SIF_FILE} ${DEF_FILE}"
 
     log "*** Exporting image with command $OCI_COMMAND"
     ${OCI_COMMAND[@]} 2>&1 | sed -e 's/^/    /' | log
