@@ -60,11 +60,11 @@ The workflow is designed to make it easy to update software versions, rebuild im
 The build environment requires:
 - **Ubuntu 24.04 LTS**
 - **Packages**:
+  - `apptainer`
   - `buildah`
   - `jq`
   - `podman`
   - `python3-ruamel.yaml`
-  - `singularity-container`
   - `yq`
 - **For ARM builds on x86 hosts**:
   - `qemu-user-static`
@@ -121,7 +121,7 @@ A build produces:
 - A **rendered recipe** (`<recipe>-<build-id>.yaml`).
 - **Release documentation** (Markdown files).
 - **SBOM files** (JSON format) for quick version checks.
-- **Build logs** and **Singularity image files** (`.sif`).
+- **Build logs** and **Singularity Image Format containers** (`.sif`).
 
 All outputs are saved in `builds/<recipe-name>-<build-id>/`.
 
